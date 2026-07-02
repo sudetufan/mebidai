@@ -6,30 +6,55 @@ const posts = [
     title: "React Nedir?",
     author: "Sude",
     content:
-      "React modern frontend geliştirmek için kullanılan popüler bir JavaScript kütüphanesidir.",
+      "React modern frontend geliştirmek için kullanılan popüler JavaScript kütüphanesidir.",
   },
   {
     id: 2,
-    title: "Next.js App Router",
+    title: "FastAPI Authentication",
     author: "Ali",
     content:
-      "App Router sayesinde dosya tabanlı routing çok daha güçlü ve kullanışlı hale geliyor.",
+      "JWT Authentication nasıl yapılır? Bu yazıda adım adım anlatıyoruz.",
   },
   {
     id: 3,
-    title: "FastAPI Giriş",
+    title: "Docker Compose",
     author: "Ayşe",
     content:
-      "FastAPI, Python ile yüksek performanslı REST API geliştirmek için kullanılan modern bir framework'tür.",
+      "Backend ve PostgreSQL'i tek komutla ayağa kaldırmayı öğrenelim.",
   },
+];
+
+const categories = [
+  "Frontend",
+  "Backend",
+  "AI",
+  "Mobile",
+  "DevOps",
 ];
 
 export default function BlogPage() {
   return (
-    <main className="max-w-4xl mx-auto py-10 px-6">
+    <main className="max-w-5xl mx-auto px-6 py-10">
       <h1 className="text-4xl font-bold mb-8">
-        Community Posts
+        Community Blog
       </h1>
+
+      <input
+        type="text"
+        placeholder="🔍 Search posts..."
+        className="w-full border rounded-xl p-4 mb-6"
+      />
+
+      <div className="flex flex-wrap gap-3 mb-10">
+        {categories.map((category) => (
+          <button
+            key={category}
+            className="px-4 py-2 bg-slate-200 rounded-full hover:bg-blue-600 hover:text-white transition"
+          >
+            {category}
+          </button>
+        ))}
+      </div>
 
       {posts.map((post) => (
         <PostCard
