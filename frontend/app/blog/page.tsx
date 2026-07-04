@@ -1,28 +1,5 @@
 import PostCard from "../../components/PostCard";
-
-const posts = [
-  {
-    id: 1,
-    title: "React Nedir?",
-    author: "Sude",
-    content:
-      "React modern frontend geliştirmek için kullanılan popüler JavaScript kütüphanesidir.",
-  },
-  {
-    id: 2,
-    title: "FastAPI Authentication",
-    author: "Ali",
-    content:
-      "JWT Authentication nasıl yapılır? Bu yazıda adım adım anlatıyoruz.",
-  },
-  {
-    id: 3,
-    title: "Docker Compose",
-    author: "Ayşe",
-    content:
-      "Backend ve PostgreSQL'i tek komutla ayağa kaldırmayı öğrenelim.",
-  },
-];
+import { getPosts } from "../../lib/api";
 
 const categories = [
   "Frontend",
@@ -32,7 +9,9 @@ const categories = [
   "DevOps",
 ];
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await getPosts();
+
   return (
     <main className="max-w-5xl mx-auto px-6 py-10">
       <h1 className="text-4xl font-bold mb-8">
@@ -56,12 +35,12 @@ export default function BlogPage() {
         ))}
       </div>
 
-      {posts.map((post) => (
+      {posts.map((post: any) => (
         <PostCard
           key={post.id}
           id={post.id}
           title={post.title}
-          author={post.author}
+          author="Anonymous"
           content={post.content}
         />
       ))}
