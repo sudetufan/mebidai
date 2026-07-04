@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MEBIDAI Community Blog
 
-## Getting Started
+A simple full-stack blog application built with **FastAPI (backend)** and **Next.js (frontend)**.
 
-First, run the development server:
+Users can register, login, create posts, and comment on posts.
+
+---
+
+## 🚀 Tech Stack
+
+### Backend
+- FastAPI
+- SQLAlchemy
+- SQLite (or your DB)
+- JWT Authentication
+
+### Frontend
+- Next.js (App Router)
+- React
+- Tailwind CSS
+
+---
+
+## ✨ Features
+
+- User registration & login
+- Create, read posts
+- View post details
+- Add comments to posts
+- Simple and clean UI
+
+---
+
+## 📁 Project Structure
+backend/ # FastAPI backend
+frontend/ # Next.js frontend
+
+---
+
+## ⚙️ Backend Setup
 
 ```bash
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+
+Backend runs on:
+
+http://127.0.0.1:8000
+
+API docs:
+
+http://127.0.0.1:8000/docs
+
+💻 Frontend Setup
+cd frontend
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Frontend runs on:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
+🔗 API Endpoints
+Auth
+POST /api/v1/users/register
+POST /api/v1/users/login
+Posts
+GET /api/v1/posts
+POST /api/v1/posts
+GET /api/v1/posts/{id}
+Comments
+GET /api/v1/comments?post_id=ID
+POST /api/v1/comments
+📌 Notes
+This is a learning project.
+No advanced role system or categories included.
+Focus is on basic full-stack CRUD workflow.
+👨‍💻 Author
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built as a full-stack learning project with FastAPI + Next.js
