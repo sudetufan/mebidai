@@ -23,14 +23,14 @@ export default function Home() {
             href="/blog"
             className="bg-blue-600 hover:bg-blue-700 transition text-white px-8 py-4 rounded-xl font-semibold"
           >
-            Explore Posts
+            Explore Blog
           </Link>
 
           <Link
             href="/register"
             className="border border-slate-400 px-8 py-4 rounded-xl hover:bg-slate-100 transition"
           >
-            Join Community
+            Get Started
           </Link>
 
         </div>
