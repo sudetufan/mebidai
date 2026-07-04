@@ -65,3 +65,28 @@ export async function loginUser(user: {
 
   return response.json();
 }
+export async function getPost(id: string) {
+  const response = await fetch(`${API_URL}/posts/${id}`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Post not found");
+  }
+
+  return response.json();
+}
+export async function getComments(postId: string) {
+  const response = await fetch(
+    `${API_URL}/comments?post_id=${postId}`,
+    {
+      cache: "no-store",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to load comments");
+  }
+
+  return response.json();
+}
