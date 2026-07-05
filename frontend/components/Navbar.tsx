@@ -1,29 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    function checkLogin() {
-      const token = localStorage.getItem("token");
-      setLoggedIn(!!token);
-    }
-
-    checkLogin();
-
-    window.addEventListener("storage", checkLogin);
-
-    return () => {
-      window.removeEventListener("storage", checkLogin);
-    };
-  }, []);
+  const router = useRouter();
+  const { user, logout } = useAuth();
 
   function handleLogout() {
-    localStorage.removeItem("token");
-    window.location.href = "/";
+    logout();
+    router.push("/");
   }
 
   return (
@@ -37,7 +24,7 @@ export default function Navbar() {
           <Link href="/">Home</Link>
           <Link href="/blog">Blog</Link>
 
-          {loggedIn ? (
+          {user ? (
             <>
               <Link href="/create-post">Create Post</Link>
 
