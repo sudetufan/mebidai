@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.db.session import get_db
+from app.api.dependencies import get_db, get_current_user
+from app.models.user import User
 from app.schemas.post import PostCreate, PostResponse
 from app.services.post_service import (
     create_post,
@@ -14,8 +15,12 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
 @router.post("/", response_model=PostResponse)
-def create(post: PostCreate, db: Session = Depends(get_db)):
-    return create_post(db, post)
+def create(
+    post: PostCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return create_post(db, post, current_user.id)
 
 
 @router.get("/", response_model=list[PostResponse])

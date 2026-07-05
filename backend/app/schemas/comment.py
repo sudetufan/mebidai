@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from app.schemas.user import UserSimple
 
 
 class CommentCreate(BaseModel):
@@ -8,6 +9,6 @@ class CommentCreate(BaseModel):
 
 class CommentResponse(CommentCreate):
     id: int
+    user: UserSimple
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

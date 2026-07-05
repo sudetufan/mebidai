@@ -1,4 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy.orm import relationship
+
 from app.db.base import Base
 
 
@@ -9,4 +11,11 @@ class Post(Base):
     title = Column(String, nullable=False)
     content = Column(Text, nullable=False)
 
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    user = relationship("User", back_populates="posts")
+    comments = relationship(
+        "Comment",
+        back_populates="post",
+        cascade="all, delete-orphan",
+    )
