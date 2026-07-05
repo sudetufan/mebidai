@@ -7,15 +7,17 @@ export async function getPosts() {
 
   return response.json();
 }
-
 export async function createPost(post: {
   title: string;
   content: string;
 }) {
+  const token = localStorage.getItem("token");
+
   const response = await fetch(`${API_URL}/posts/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(post),
   });
@@ -86,6 +88,27 @@ export async function getComments(postId: string) {
 
   if (!response.ok) {
     throw new Error("Failed to load comments");
+  }
+
+  return response.json();
+}
+export async function createComment(comment: {
+  content: string;
+  post_id: number;
+}) {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_URL}/comments/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(comment),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create comment");
   }
 
   return response.json();

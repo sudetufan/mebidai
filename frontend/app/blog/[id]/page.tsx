@@ -21,7 +21,7 @@ export default async function PostDetailPage({ params }: PageProps) {
       </h1>
 
       <p className="text-gray-500 mb-8">
-  👤 Anonymous • Post #{id}
+   👤 {post.user.username} • Post #{id}
 </p>
       <div className="bg-white rounded-xl shadow-md p-8">
         <p className="leading-8 text-lg">
@@ -43,6 +43,9 @@ export default async function PostDetailPage({ params }: PageProps) {
         key={comment.id}
         className="bg-gray-100 rounded-lg p-4 mb-4"
       >
+        <p className="text-sm font-semibold">
+          👤 {comment.user.username}
+        </p>
         <p>{comment.content}</p>
       </div>
     ))

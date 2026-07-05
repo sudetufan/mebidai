@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import PostCard from "../../components/PostCard";
 import { getPosts } from "../../lib/api";
 
@@ -15,7 +16,7 @@ export default async function BlogPage() {
           key={post.id}
           id={post.id}
           title={post.title}
-          author="Anonymous"
+          author={post.user.username}
           content={post.content}
         />
       ))}

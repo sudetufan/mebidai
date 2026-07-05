@@ -12,12 +12,15 @@ export default function CommentForm({ postId }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    const token = localStorage.getItem("token");
+
     const response = await fetch(
       "http://127.0.0.1:8000/api/v1/comments/",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           content,

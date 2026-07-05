@@ -9,11 +9,19 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    if (!email || !password) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
+      setLoading(true);
+
       const data = await loginUser({
         email,
         password,
@@ -21,12 +29,12 @@ export default function LoginPage() {
 
       localStorage.setItem("token", data.access_token);
 
-      alert("Login successful!");
-
-      router.push("/blog");
+      window.location.href = "/blog";
     } catch (error) {
       console.error(error);
       alert("Invalid email or password.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -55,9 +63,10 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
     </main>
