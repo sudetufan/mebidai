@@ -140,3 +140,21 @@ def delete_post(
     return {
         "message": "Post deleted successfully"
     }
+
+def get_user_posts(
+    db: Session,
+    user_id: int,
+):
+    posts = (
+        db.query(Post)
+        .options(joinedload(Post.user))
+        .filter(Post.user_id == user_id)
+        .order_by(Post.id.desc())
+        .all()
+    )
+
+    for post in posts:
+        post.like_count = len(post.likes)
+        post.liked = False
+
+    return posts

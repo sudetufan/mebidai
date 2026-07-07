@@ -12,15 +12,13 @@ export default function CommentForm({ postId }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
-
     const response = await fetch(
-      "http://127.0.0.1:8000/api/v1/comments/",
+      "http://localhost:8000/api/v1/comments/",
       {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           content,
@@ -30,7 +28,6 @@ export default function CommentForm({ postId }: Props) {
     );
 
     if (response.ok) {
-      alert("Yorum eklendi!");
       setContent("");
       window.location.reload();
     } else {

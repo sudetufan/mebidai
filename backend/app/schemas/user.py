@@ -30,7 +30,6 @@ class UserResponse(BaseModel):
         from_attributes = True
 
 
-# 👇 YENİ
 class UserProfile(BaseModel):
     id: int
     username: str

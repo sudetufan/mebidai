@@ -12,10 +12,15 @@ from app.schemas.user import (
     UserLogin,
     UserProfile,
 )
+from app.schemas.post import PostResponse
+
 from app.services.user_service import (
     create_user,
     login_user,
     get_profile,
+)
+from app.services.post_service import (
+    get_user_posts,
 )
 
 router = APIRouter(
@@ -68,7 +73,6 @@ def me(
     }
 
 
-# 🔥 PROFILE ENDPOINT
 @router.get(
     "/profile",
     response_model=UserProfile,
@@ -78,6 +82,20 @@ def profile(
     current_user: User = Depends(get_current_user),
 ):
     return get_profile(db, current_user)
+
+
+@router.get(
+    "/profile/posts",
+    response_model=list[PostResponse],
+)
+def profile_posts(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_user_posts(
+        db,
+        current_user.id,
+    )
 
 
 @router.post("/logout")
