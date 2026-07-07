@@ -22,8 +22,9 @@ class UserMini(BaseModel):
 
 class UserResponse(BaseModel):
     id: int
-    email: EmailStr
     username: str
+    email: EmailStr
+    role: str
 
     class Config:
         from_attributes = True
@@ -32,6 +33,7 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
 
 class UserSimple(BaseModel):
     id: int

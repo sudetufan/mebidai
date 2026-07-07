@@ -11,4 +11,7 @@ class PostResponse(PostCreate):
     id: int
     user: UserSimple
 
+    like_count: int = 0
+    liked: bool = False
+
     model_config = ConfigDict(from_attributes=True)

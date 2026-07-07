@@ -23,6 +23,7 @@ export default function Navbar() {
         <div className="flex gap-6 items-center">
           <Link href="/">Home</Link>
           <Link href="/blog">Blog</Link>
+          <Link href="/admin">Admin Panel</Link>
 
           {user ? (
             <>

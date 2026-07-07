@@ -1,18 +1,20 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.services.user_service import delete_user
+
 from app.api.dependencies import (
     get_db,
     get_admin_user,
 )
-
 from app.models.user import User
 
 from app.schemas.user import UserResponse
 from app.schemas.post import PostResponse
 from app.schemas.comment import CommentResponse
 
-from app.services.user_service import get_users
+from app.services.user_service import (
+    get_users,
+    delete_user,
+)
 from app.services.post_service import (
     get_posts,
     delete_post,
@@ -47,7 +49,8 @@ def read_posts(
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):
-    return get_posts(db)
+    # Admin kullanıcısını current_user olarak gönderiyoruz.
+    return get_posts(db, admin)
 
 
 @router.get(
@@ -77,6 +80,8 @@ def remove_comment(
     admin: User = Depends(get_admin_user),
 ):
     return delete_comment(db, comment_id)
+
+
 @router.delete("/users/{user_id}")
 def delete_user_endpoint(
     user_id: int,

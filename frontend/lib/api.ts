@@ -1,23 +1,15 @@
-const API_URL = "http://127.0.0.1:8000/api/v1";
+const API_URL = "http://localhost:8000/api/v1";
 
-export async function getPosts() {
-  const response = await fetch(`${API_URL}/posts/`, {
-    cache: "no-store",
-  });
 
-  return response.json();
-}
 export async function createPost(post: {
   title: string;
   content: string;
 }) {
-  const token = localStorage.getItem("token");
-
   const response = await fetch(`${API_URL}/posts/`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(post),
   });
@@ -55,6 +47,7 @@ export async function loginUser(user: {
 }) {
   const response = await fetch(`${API_URL}/users/login`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
@@ -67,9 +60,11 @@ export async function loginUser(user: {
 
   return response.json();
 }
+
 export async function getPost(id: string) {
   const response = await fetch(`${API_URL}/posts/${id}`, {
     cache: "no-store",
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -78,11 +73,13 @@ export async function getPost(id: string) {
 
   return response.json();
 }
+
 export async function getComments(postId: string) {
   const response = await fetch(
     `${API_URL}/comments?post_id=${postId}`,
     {
       cache: "no-store",
+      credentials: "include",
     }
   );
 
@@ -92,23 +89,48 @@ export async function getComments(postId: string) {
 
   return response.json();
 }
+
 export async function createComment(comment: {
   content: string;
   post_id: number;
 }) {
-  const token = localStorage.getItem("token");
-
   const response = await fetch(`${API_URL}/comments/`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(comment),
   });
 
   if (!response.ok) {
     throw new Error("Failed to create comment");
+  }
+
+  return response.json();
+}
+
+export async function likePost(postId: number) {
+  const response = await fetch(`${API_URL}/posts/${postId}/like`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to like post");
+  }
+
+  return response.json();
+}
+
+export async function unlikePost(postId: number) {
+  const response = await fetch(`${API_URL}/posts/${postId}/like`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to unlike post");
   }
 
   return response.json();

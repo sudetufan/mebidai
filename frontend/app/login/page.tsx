@@ -3,9 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginUser } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+
+const API_URL = "http://localhost:8000/api/v1";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setUser } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,14 +26,24 @@ export default function LoginPage() {
     try {
       setLoading(true);
 
-      const data = await loginUser({
+      await loginUser({
         email,
         password,
       });
 
-      localStorage.setItem("token", data.access_token);
+      // Login sonrası kullanıcıyı çek
+      const res = await fetch(`${API_URL}/users/me`, {
+        credentials: "include",
+      });
 
-      window.location.href = "/blog";
+      if (!res.ok) {
+        throw new Error("Failed to fetch user");
+      }
+
+      const user = await res.json();
+      setUser(user);
+
+      router.push("/blog");
     } catch (error) {
       console.error(error);
       alert("Invalid email or password.");
