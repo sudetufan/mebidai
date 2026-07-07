@@ -30,6 +30,20 @@ class UserResponse(BaseModel):
         from_attributes = True
 
 
+# 👇 YENİ
+class UserProfile(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+    role: str
+
+    post_count: int
+    comment_count: int
+
+    class Config:
+        from_attributes = True
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str

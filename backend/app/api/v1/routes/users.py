@@ -2,11 +2,20 @@ from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
 from app.models.user import User
-from app.api.dependencies import get_db, get_admin_user, get_current_user
-from app.schemas.user import UserCreate, UserLogin
+from app.api.dependencies import (
+    get_db,
+    get_admin_user,
+    get_current_user,
+)
+from app.schemas.user import (
+    UserCreate,
+    UserLogin,
+    UserProfile,
+)
 from app.services.user_service import (
     create_user,
     login_user,
+    get_profile,
 )
 
 router = APIRouter(
@@ -47,9 +56,10 @@ def login(
     return {"message": "Login successful"}
 
 
-# 🔥 NEW: USER SESSION ENDPOINT
 @router.get("/me")
-def me(current_user: User = Depends(get_current_user)):
+def me(
+    current_user: User = Depends(get_current_user),
+):
     return {
         "id": current_user.id,
         "username": current_user.username,
@@ -58,10 +68,27 @@ def me(current_user: User = Depends(get_current_user)):
     }
 
 
+# 🔥 PROFILE ENDPOINT
+@router.get(
+    "/profile",
+    response_model=UserProfile,
+)
+def profile(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_profile(db, current_user)
+
+
 @router.post("/logout")
 def logout(response: Response):
-    response.delete_cookie("access_token", path="/")
-    return {"message": "Logged out"}
+    response.delete_cookie(
+        "access_token",
+        path="/",
+    )
+    return {
+        "message": "Logged out"
+    }
 
 
 @router.get("/admin-test")

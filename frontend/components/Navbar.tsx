@@ -16,18 +16,35 @@ export default function Navbar() {
   return (
     <nav className="bg-slate-900 text-white shadow-md">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
-        <Link href="/" className="text-2xl font-bold">
+
+        <Link
+          href="/"
+          className="text-2xl font-bold"
+        >
           MEBIDAI
         </Link>
 
         <div className="flex gap-6 items-center">
+
           <Link href="/">Home</Link>
+
           <Link href="/blog">Blog</Link>
-          <Link href="/admin">Admin Panel</Link>
 
           {user ? (
             <>
-              <Link href="/create-post">Create Post</Link>
+              <Link href="/create-post">
+                Create Post
+              </Link>
+
+              <Link href="/profile">
+                My Profile
+              </Link>
+
+              {user.role === "admin" && (
+                <Link href="/admin">
+                  Admin Panel
+                </Link>
+              )}
 
               <button
                 onClick={handleLogout}
@@ -38,11 +55,18 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/login">Login</Link>
-              <Link href="/register">Register</Link>
+              <Link href="/login">
+                Login
+              </Link>
+
+              <Link href="/register">
+                Register
+              </Link>
             </>
           )}
+
         </div>
+
       </div>
     </nav>
   );
