@@ -8,42 +8,51 @@ export default function AdminPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [posts, setPosts] = useState<any[]>([]);
   const [comments, setComments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("loadData çalıştı");
     loadData();
   }, []);
 
   async function loadData() {
-    console.log("loadData başladı");
-    const headers = {
-      credentials: "include",
-    };
-    const [usersRes, postsRes, commentsRes] = await Promise.all([
-      fetch(`${API_URL}/admin/users`, {
-        credentials: "include",
-      }),
-      fetch(`${API_URL}/admin/posts`, {
-        credentials: "include",
-      }),
-      fetch(`${API_URL}/admin/comments`, {
-        credentials: "include",
-      }),
-    ]);
+    try {
+      const [usersRes, postsRes, commentsRes] = await Promise.all([
+        fetch(`${API_URL}/admin/users`, {
+          credentials: "include",
+        }),
+        fetch(`${API_URL}/admin/posts`, {
+          credentials: "include",
+        }),
+        fetch(`${API_URL}/admin/comments`, {
+          credentials: "include",
+        }),
+      ]);
 
-    if (usersRes.status === 401 || usersRes.status === 403) {
-      alert("Bu sayfaya erişim yetkiniz yok.");
-      window.location.href = "/login";
-      return;
+      if (
+        usersRes.status === 401 ||
+        usersRes.status === 403
+      ) {
+        alert("Bu sayfaya erişim yetkiniz yok.");
+        window.location.href = "/login";
+        return;
+      }
+
+      setUsers(await usersRes.json());
+      setPosts(await postsRes.json());
+      setComments(await commentsRes.json());
+
+    } catch (error) {
+      console.error("Admin data loading error:", error);
+    } finally {
+      setLoading(false);
     }
-
-    setUsers(await usersRes.json());
-    setPosts(await postsRes.json());
-    setComments(await commentsRes.json());
   }
 
+
   async function deleteUser(id: number) {
-    if (!confirm("Bu kullanıcıyı silmek istediğinize emin misiniz?")) return;
+    if (!confirm("Bu kullanıcıyı silmek istediğinize emin misiniz?")) {
+      return;
+    }
 
     const response = await fetch(
       `${API_URL}/admin/users/${id}`,
@@ -60,8 +69,11 @@ export default function AdminPage() {
     }
   }
 
+
   async function deletePost(id: number) {
-    if (!confirm("Bu postu silmek istediğinize emin misiniz?")) return;
+    if (!confirm("Bu postu silmek istediğinize emin misiniz?")) {
+      return;
+    }
 
     const response = await fetch(
       `${API_URL}/admin/posts/${id}`,
@@ -78,8 +90,11 @@ export default function AdminPage() {
     }
   }
 
+
   async function deleteComment(id: number) {
-    if (!confirm("Bu yorumu silmek istediğinize emin misiniz?")) return;
+    if (!confirm("Bu yorumu silmek istediğinize emin misiniz?")) {
+      return;
+    }
 
     const response = await fetch(
       `${API_URL}/admin/comments/${id}`,
@@ -96,39 +111,82 @@ export default function AdminPage() {
     }
   }
 
+
+  if (loading) {
+    return (
+      <main className="max-w-6xl mx-auto py-10 px-6">
+        <p className="text-center text-gray-500">
+          Loading admin panel...
+        </p>
+      </main>
+    );
+  }
+
+
   return (
     <main className="max-w-6xl mx-auto py-10 px-6">
-      <h1 className="text-4xl font-bold mb-8">👑 Admin Panel</h1>
 
-      {/* STATS */}
+      <h1 className="text-4xl font-bold mb-8">
+        Admin Panel
+      </h1>
+
+
       <div className="grid grid-cols-3 gap-6 mb-10">
-        <div className="bg-white shadow rounded-xl p-6">
-          <h2 className="font-bold text-xl">Users</h2>
-          <p className="text-4xl mt-4">{users.length}</p>
-        </div>
 
         <div className="bg-white shadow rounded-xl p-6">
-          <h2 className="font-bold text-xl">Posts</h2>
-          <p className="text-4xl mt-4">{posts.length}</p>
+          <h2 className="font-bold text-xl">
+            Users
+          </h2>
+
+          <p className="text-4xl mt-4">
+            {users.length}
+          </p>
         </div>
 
+
         <div className="bg-white shadow rounded-xl p-6">
-          <h2 className="font-bold text-xl">Comments</h2>
-          <p className="text-4xl mt-4">{comments.length}</p>
+          <h2 className="font-bold text-xl">
+            Posts
+          </h2>
+
+          <p className="text-4xl mt-4">
+            {posts.length}
+          </p>
         </div>
+
+
+        <div className="bg-white shadow rounded-xl p-6">
+          <h2 className="font-bold text-xl">
+            Comments
+          </h2>
+
+          <p className="text-4xl mt-4">
+            {comments.length}
+          </p>
+        </div>
+
       </div>
 
-      {/* USERS */}
-      <h2 className="text-2xl font-bold mb-4">👥 Users</h2>
+
+      <h2 className="text-2xl font-bold mb-4">
+        Users
+      </h2>
 
       {users.map((user: any) => (
         <div
           key={user.id}
           className="bg-white shadow rounded-lg p-4 mb-3 flex justify-between items-center"
         >
+
           <div>
-            <p className="font-bold">{user.username}</p>
-            <p className="text-gray-500">{user.email}</p>
+            <p className="font-bold">
+              {user.username}
+            </p>
+
+            <p className="text-gray-500">
+              {user.email}
+            </p>
+
             <span
               className={
                 user.role === "admin"
@@ -140,6 +198,7 @@ export default function AdminPage() {
             </span>
           </div>
 
+
           {user.role !== "admin" && (
             <button
               onClick={() => deleteUser(user.id)}
@@ -148,21 +207,33 @@ export default function AdminPage() {
               Delete
             </button>
           )}
+
         </div>
       ))}
 
-      {/* POSTS */}
-      <h2 className="text-2xl font-bold mt-10 mb-4">📝 Posts</h2>
+
+
+      <h2 className="text-2xl font-bold mt-10 mb-4">
+        Posts
+      </h2>
+
 
       {posts.map((post: any) => (
         <div
           key={post.id}
           className="bg-white shadow rounded-lg p-4 mb-3 flex justify-between items-center"
         >
+
           <div>
-            <p className="font-bold">{post.title}</p>
-            <p className="text-gray-500">👤 {post.user.username}</p>
+            <p className="font-bold">
+              {post.title}
+            </p>
+
+            <p className="text-gray-500">
+              {post.user.username}
+            </p>
           </div>
+
 
           <button
             onClick={() => deletePost(post.id)}
@@ -170,21 +241,33 @@ export default function AdminPage() {
           >
             Delete
           </button>
+
         </div>
       ))}
 
-      {/* COMMENTS */}
-      <h2 className="text-2xl font-bold mt-10 mb-4">💬 Comments</h2>
+
+
+      <h2 className="text-2xl font-bold mt-10 mb-4">
+        Comments
+      </h2>
+
 
       {comments.map((comment: any) => (
         <div
           key={comment.id}
           className="bg-white shadow rounded-lg p-4 mb-3 flex justify-between items-center"
         >
+
           <div>
-            <p>{comment.content}</p>
-            <p className="text-gray-500">👤 {comment.user.username}</p>
+            <p>
+              {comment.content}
+            </p>
+
+            <p className="text-gray-500">
+              {comment.user.username}
+            </p>
           </div>
+
 
           <button
             onClick={() => deleteComment(comment.id)}
@@ -192,8 +275,10 @@ export default function AdminPage() {
           >
             Delete
           </button>
+
         </div>
       ))}
+
     </main>
   );
 }
