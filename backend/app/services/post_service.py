@@ -25,13 +25,14 @@ def create_post(
     return new_post
 
 
+
 def get_posts(
     db: Session,
     current_user: User | None,
 ):
     posts = (
         db.query(Post)
-        .options(joinedload(Post.user))   # 🔥 user fix
+        .options(joinedload(Post.user))
         .all()
     )
 
@@ -49,10 +50,12 @@ def get_posts(
             )
 
             post.liked = liked is not None
+
         else:
             post.liked = False
 
     return posts
+
 
 
 def get_post(
@@ -62,7 +65,7 @@ def get_post(
 ):
     post = (
         db.query(Post)
-        .options(joinedload(Post.user))   # 🔥 USER FIX BURADA
+        .options(joinedload(Post.user))
         .filter(Post.id == post_id)
         .first()
     )
@@ -86,16 +89,19 @@ def get_post(
         )
 
         post.liked = liked is not None
+
     else:
         post.liked = False
 
     return post
 
 
+
 def update_post(
     db: Session,
     post_id: int,
     post: PostCreate,
+    current_user: User,
 ):
     existing_post = (
         db.query(Post)
@@ -109,6 +115,17 @@ def update_post(
             detail="Post not found",
         )
 
+
+    if (
+        existing_post.user_id != current_user.id
+        and current_user.role != "admin"
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="You cannot update this post",
+        )
+
+
     existing_post.title = post.title
     existing_post.content = post.content
 
@@ -118,9 +135,11 @@ def update_post(
     return existing_post
 
 
+
 def delete_post(
     db: Session,
     post_id: int,
+    current_user: User,
 ):
     post = (
         db.query(Post)
@@ -134,12 +153,25 @@ def delete_post(
             detail="Post not found",
         )
 
+
+    if (
+        post.user_id != current_user.id
+        and current_user.role != "admin"
+    ):
+        raise HTTPException(
+            status_code=403,
+            detail="You cannot delete this post",
+        )
+
+
     db.delete(post)
     db.commit()
 
     return {
         "message": "Post deleted successfully"
     }
+
+
 
 def get_user_posts(
     db: Session,

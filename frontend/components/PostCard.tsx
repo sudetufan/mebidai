@@ -16,7 +16,7 @@ export default function PostCard({
   author,
   content,
   likeCount,
-  liked
+  liked,
 }: PostCardProps) {
   return (
     <Link href={`/blog/${id}`}>
@@ -26,25 +26,32 @@ export default function PostCard({
           {title}
         </h2>
 
+
         <p className="text-sm text-gray-500 mb-4">
-          👤 {author ?? "Anonymous"}
+          {author ?? "Anonymous"}
         </p>
+
 
         <p className="text-gray-700 mb-6 line-clamp-3">
           {content}
         </p>
 
+
         <div className="flex justify-between items-center">
+
           <LikeButton
             postId={id}
             initialLikes={likeCount}
             initiallyLiked={liked}
           />
 
+
           <span className="text-blue-600 font-semibold">
-              Devamını Oku →
+            Read More →
           </span>
+
         </div>
+
       </div>
     </Link>
   );

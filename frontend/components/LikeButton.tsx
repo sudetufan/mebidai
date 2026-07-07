@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { likePost, unlikePost } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { Heart } from "lucide-react";
 
 type LikeButtonProps = {
   postId: number;
@@ -17,28 +18,36 @@ export default function LikeButton({
 }: LikeButtonProps) {
   const [liked, setLiked] = useState(initiallyLiked);
   const [likes, setLikes] = useState(initialLikes);
+
   const router = useRouter();
+
 
   async function handleLike() {
     try {
       if (liked) {
         await unlikePost(postId);
+
         setLiked(false);
         setLikes((prev) => prev - 1);
+
       } else {
         await likePost(postId);
+
         setLiked(true);
         setLikes((prev) => prev + 1);
       }
 
-      // 🔥 önemli kısım: sayfayı backend ile senkronla
+
+      // Sync page with backend response
       router.refresh();
+
 
     } catch (err) {
       console.error(err);
-      alert("İşlem başarısız.");
+      alert("Operation failed.");
     }
   }
+
 
   return (
     <button
@@ -47,9 +56,22 @@ export default function LikeButton({
         e.stopPropagation();
         handleLike();
       }}
-      className="flex items-center gap-2 rounded-lg border px-3 py-2 hover:bg-gray-100"
+      className="flex items-center gap-2 rounded-lg border px-4 py-2 hover:bg-gray-100 transition"
     >
-      {liked ? "❤️" : "🤍"} {likes}
+
+      <Heart
+        size={20}
+        className={
+          liked
+            ? "fill-red-500 text-red-500"
+            : "text-gray-400"
+        }
+      />
+
+      <span>
+        {likes}
+      </span>
+
     </button>
   );
 }

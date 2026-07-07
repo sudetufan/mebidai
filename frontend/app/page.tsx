@@ -4,8 +4,6 @@ export default function Home() {
   return (
     <main className="bg-slate-50 min-h-screen">
 
-      {/* Hero */}
-
       <section className="max-w-6xl mx-auto py-24 px-6 text-center">
 
         <h1 className="text-6xl font-extrabold text-slate-900">
@@ -37,7 +35,6 @@ export default function Home() {
 
       </section>
 
-      {/* Features */}
 
       <section className="max-w-6xl mx-auto px-6 pb-20">
 
@@ -45,11 +42,15 @@ export default function Home() {
           Why MEBIDAI?
         </h2>
 
+
         <div className="grid md:grid-cols-3 gap-8">
+
 
           <div className="bg-white rounded-xl shadow-md p-8">
 
-            <div className="text-5xl">📝</div>
+            <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
+              A
+            </div>
 
             <h3 className="font-bold text-2xl mt-4">
               Publish Articles
@@ -61,9 +62,13 @@ export default function Home() {
 
           </div>
 
+
+
           <div className="bg-white rounded-xl shadow-md p-8">
 
-            <div className="text-5xl">💬</div>
+            <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center text-green-600 font-bold text-xl">
+              C
+            </div>
 
             <h3 className="font-bold text-2xl mt-4">
               Discuss
@@ -75,9 +80,13 @@ export default function Home() {
 
           </div>
 
+
+
           <div className="bg-white rounded-xl shadow-md p-8">
 
-            <div className="text-5xl">🚀</div>
+            <div className="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-xl">
+              G
+            </div>
 
             <h3 className="font-bold text-2xl mt-4">
               Grow Together
@@ -88,6 +97,7 @@ export default function Home() {
             </p>
 
           </div>
+
 
         </div>
 

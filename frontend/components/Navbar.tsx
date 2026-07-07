@@ -24,21 +24,35 @@ export default function Navbar() {
           MEBIDAI
         </Link>
 
+
         <div className="flex gap-6 items-center">
 
-          <Link href="/">Home</Link>
+          <Link href="/">
+            Home
+          </Link>
 
-          <Link href="/blog">Blog</Link>
+          <Link href="/blog">
+            Blog
+          </Link>
+
 
           {user ? (
             <>
+
+              <Link href="/dashboard">
+                Dashboard
+              </Link>
+
+
               <Link href="/create-post">
                 Create Post
               </Link>
 
+
               <Link href="/profile">
                 My Profile
               </Link>
+
 
               {user.role === "admin" && (
                 <Link href="/admin">
@@ -46,22 +60,27 @@ export default function Navbar() {
                 </Link>
               )}
 
+
               <button
                 onClick={handleLogout}
                 className="text-red-400 hover:text-red-300"
               >
                 Logout
               </button>
+
             </>
           ) : (
             <>
+
               <Link href="/login">
                 Login
               </Link>
 
+
               <Link href="/register">
                 Register
               </Link>
+
             </>
           )}
 

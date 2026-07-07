@@ -26,7 +26,6 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  // 🔥 AUTO LOGIN CHECK (CRITICAL FIX)
   useEffect(() => {
     fetch(`${API_URL}/users/me`, {
       credentials: "include",

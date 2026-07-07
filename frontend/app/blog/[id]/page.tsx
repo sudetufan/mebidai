@@ -6,7 +6,6 @@ import LikeButton from "@/components/LikeButton";
 export default async function PostDetailPage({ params }: any) {
   const { id } = await params;
 
-  // Cookie ile birlikte backend'e istek atılır
   const post = await serverFetch(`/posts/${id}`);
 
   const comments = await getComments(id);
@@ -19,17 +18,20 @@ export default async function PostDetailPage({ params }: any) {
         {post.title}
       </h1>
 
+
       {/* AUTHOR */}
       <p className="text-gray-500 mb-6">
-        👤 {post.user?.username}
+        Author: {post.user?.username}
       </p>
 
-      {/* CONTENT CARD */}
+
+      {/* CONTENT */}
       <div className="bg-white rounded-xl shadow-md p-8 mb-6">
         <p className="leading-8 text-lg text-gray-800">
           {post.content}
         </p>
       </div>
+
 
       {/* LIKE */}
       <div className="mb-10">
@@ -40,30 +42,49 @@ export default async function PostDetailPage({ params }: any) {
         />
       </div>
 
+
       {/* COMMENTS */}
       <div>
+
         <h2 className="text-2xl font-bold mb-4">
-          💬 Yorumlar
+          Comments
         </h2>
 
+
         {comments.length === 0 ? (
-          <p className="text-gray-500">Henüz yorum yok.</p>
+
+          <p className="text-gray-500">
+            No comments yet.
+          </p>
+
         ) : (
+
           comments.map((comment: any) => (
+
             <div
               key={comment.id}
               className="bg-gray-100 rounded-lg p-4 mb-3"
             >
+
               <p className="text-sm font-semibold">
-                👤 {comment.user.username}
+                {comment.user.username}
               </p>
-              <p>{comment.content}</p>
+
+              <p>
+                {comment.content}
+              </p>
+
             </div>
+
           ))
+
         )}
 
+
         <CommentForm postId={Number(id)} />
+
       </div>
+
     </main>
   );
 }

@@ -1,7 +1,9 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+
 from app.models.post import Post
 from app.models.comment import Comment
+from app.models.like import Like
 from app.security import (
     hash_password,
     verify_password,
@@ -40,6 +42,7 @@ def create_user(
     return new_user
 
 
+
 def login_user(
     db: Session,
     email: str,
@@ -71,8 +74,10 @@ def login_user(
     )
 
 
+
 def get_users(db: Session):
     return db.query(User).all()
+
 
 
 def delete_user(
@@ -110,21 +115,40 @@ def delete_user(
     return {
         "message": "User deleted successfully"
     }
+
+
+
 def get_profile(
     db: Session,
     current_user: User,
 ):
     post_count = (
         db.query(Post)
-        .filter(Post.user_id == current_user.id)
+        .filter(
+            Post.user_id == current_user.id
+        )
         .count()
     )
 
+
     comment_count = (
         db.query(Comment)
-        .filter(Comment.user_id == current_user.id)
+        .filter(
+            Comment.user_id == current_user.id
+        )
         .count()
     )
+
+
+    like_count = (
+        db.query(Like)
+        .join(Post)
+        .filter(
+            Post.user_id == current_user.id
+        )
+        .count()
+    )
+
 
     return {
         "id": current_user.id,
@@ -133,4 +157,5 @@ def get_profile(
         "role": current_user.role,
         "post_count": post_count,
         "comment_count": comment_count,
+        "like_count": like_count,
     }

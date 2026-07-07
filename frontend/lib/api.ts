@@ -135,3 +135,29 @@ export async function unlikePost(postId: number) {
 
   return response.json();
 }
+
+export async function updatePost(
+  id: number,
+  post: {
+    title: string;
+    content: string;
+  }
+) {
+  const response = await fetch(
+    `${API_URL}/posts/${id}`,
+    {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(post),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to update post");
+  }
+
+  return response.json();
+}
