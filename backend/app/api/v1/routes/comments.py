@@ -4,13 +4,13 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import (
     get_db,
     get_current_user,
-    get_admin_user,
 )
 
 from app.models.user import User
 
 from app.schemas.comment import (
     CommentCreate,
+    CommentUpdate,
     CommentResponse,
 )
 
@@ -20,7 +20,6 @@ from app.services.comment_service import (
     update_comment,
     delete_comment,
 )
-
 
 router = APIRouter(
     prefix="/comments",
@@ -55,7 +54,7 @@ def read_comments(
 @router.put("/{comment_id}", response_model=CommentResponse)
 def update(
     comment_id: int,
-    comment: CommentCreate,
+    comment: CommentUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):

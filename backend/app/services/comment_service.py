@@ -4,8 +4,10 @@ from fastapi import HTTPException
 from app.models.comment import Comment
 from app.models.user import User
 
-from app.schemas.comment import CommentCreate
-
+from app.schemas.comment import (
+    CommentCreate,
+    CommentUpdate,
+)
 
 
 def create_comment(
@@ -26,7 +28,6 @@ def create_comment(
     return new_comment
 
 
-
 def get_comments(
     db: Session,
     post_id: int,
@@ -38,18 +39,16 @@ def get_comments(
     )
 
 
-
 def get_all_comments(
     db: Session,
 ):
     return db.query(Comment).all()
 
 
-
 def update_comment(
     db: Session,
     comment_id: int,
-    data: CommentCreate,
+    data: CommentUpdate,
     current_user: User,
 ):
     comment = (
@@ -58,13 +57,11 @@ def update_comment(
         .first()
     )
 
-
     if not comment:
         raise HTTPException(
             status_code=404,
             detail="Comment not found",
         )
-
 
     if (
         comment.user_id != current_user.id
@@ -75,14 +72,12 @@ def update_comment(
             detail="You cannot update this comment",
         )
 
-
     comment.content = data.content
 
     db.commit()
     db.refresh(comment)
 
     return comment
-
 
 
 def delete_comment(
@@ -96,13 +91,11 @@ def delete_comment(
         .first()
     )
 
-
     if not comment:
         raise HTTPException(
             status_code=404,
             detail="Comment not found",
         )
-
 
     if (
         comment.user_id != current_user.id
@@ -113,10 +106,8 @@ def delete_comment(
             detail="You cannot delete this comment",
         )
 
-
     db.delete(comment)
     db.commit()
-
 
     return {
         "message": "Comment deleted successfully"

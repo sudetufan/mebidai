@@ -7,6 +7,10 @@ class CommentCreate(BaseModel):
     post_id: int
 
 
+class CommentUpdate(BaseModel):
+    content: str
+
+
 class CommentResponse(CommentCreate):
     id: int
     user: UserSimple
