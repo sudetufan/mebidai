@@ -23,6 +23,7 @@ from app.services.post_service import (
     create_post,
     get_posts,
     get_post,
+    search_posts,
     update_post,
     delete_post,
 )
@@ -54,6 +55,19 @@ def read_posts(
 ):
     return get_posts(
         db,
+        current_user,
+    )
+
+
+@router.get("/search", response_model=list[PostResponse])
+def search(
+    q: str,
+    db: Session = Depends(get_db),
+    current_user: User | None = Depends(get_optional_user),
+):
+    return search_posts(
+        db,
+        q,
         current_user,
     )
 

@@ -1,10 +1,36 @@
 from fastapi import HTTPException
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.like import Like
 from app.models.post import Post
 from app.models.user import User
 from app.schemas.post import PostCreate
+
+
+def prepare_posts(
+    posts: list[Post],
+    db: Session,
+    current_user: User | None,
+):
+    for post in posts:
+        post.like_count = len(post.likes)
+
+        if current_user:
+            liked = (
+                db.query(Like)
+                .filter(
+                    Like.post_id == post.id,
+                    Like.user_id == current_user.id,
+                )
+                .first()
+            )
+
+            post.liked = liked is not None
+        else:
+            post.liked = False
+
+    return posts
 
 
 def create_post(
@@ -25,7 +51,6 @@ def create_post(
     return new_post
 
 
-
 def get_posts(
     db: Session,
     current_user: User | None,
@@ -36,26 +61,11 @@ def get_posts(
         .all()
     )
 
-    for post in posts:
-        post.like_count = len(post.likes)
-
-        if current_user:
-            liked = (
-                db.query(Like)
-                .filter(
-                    Like.post_id == post.id,
-                    Like.user_id == current_user.id,
-                )
-                .first()
-            )
-
-            post.liked = liked is not None
-
-        else:
-            post.liked = False
-
-    return posts
-
+    return prepare_posts(
+        posts,
+        db,
+        current_user,
+    )
 
 
 def get_post(
@@ -89,12 +99,10 @@ def get_post(
         )
 
         post.liked = liked is not None
-
     else:
         post.liked = False
 
     return post
-
 
 
 def update_post(
@@ -115,7 +123,6 @@ def update_post(
             detail="Post not found",
         )
 
-
     if (
         existing_post.user_id != current_user.id
         and current_user.role != "admin"
@@ -125,7 +132,6 @@ def update_post(
             detail="You cannot update this post",
         )
 
-
     existing_post.title = post.title
     existing_post.content = post.content
 
@@ -133,7 +139,6 @@ def update_post(
     db.refresh(existing_post)
 
     return existing_post
-
 
 
 def delete_post(
@@ -153,7 +158,6 @@ def delete_post(
             detail="Post not found",
         )
 
-
     if (
         post.user_id != current_user.id
         and current_user.role != "admin"
@@ -163,14 +167,12 @@ def delete_post(
             detail="You cannot delete this post",
         )
 
-
     db.delete(post)
     db.commit()
 
     return {
         "message": "Post deleted successfully"
     }
-
 
 
 def get_user_posts(
@@ -185,8 +187,32 @@ def get_user_posts(
         .all()
     )
 
-    for post in posts:
-        post.like_count = len(post.likes)
-        post.liked = False
+    return prepare_posts(
+        posts,
+        db,
+        None,
+    )
 
-    return posts
+
+def search_posts(
+    db: Session,
+    query: str,
+    current_user: User | None,
+):
+    posts = (
+        db.query(Post)
+        .options(joinedload(Post.user))
+        .filter(
+            or_(
+                Post.title.ilike(f"%{query}%"),
+                Post.content.ilike(f"%{query}%"),
+            )
+        )
+        .all()
+    )
+
+    return prepare_posts(
+        posts,
+        db,
+        current_user,
+    )
