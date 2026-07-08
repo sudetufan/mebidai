@@ -1,8 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createPost } from "@/lib/api";
+
+import { createPost, getCategories } from "@/lib/api";
+
+type Category = {
+  id: number;
+  name: string;
+};
 
 export default function CreatePostPage() {
   const router = useRouter();
@@ -10,37 +16,71 @@ export default function CreatePostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+
+        if (data.length > 0) {
+          setCategoryId(data[0].id);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    loadCategories();
+  }, []);
+
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!categoryId) {
+      alert("Please select a category");
+      return;
+    }
 
     try {
       await createPost({
         title,
         content,
+        category_id: categoryId,
       });
 
       alert("Post created successfully!");
 
       router.push("/blog");
+
     } catch (error) {
       console.error(error);
       alert("Failed to create post.");
     }
   }
 
+
   return (
     <main className="max-w-3xl mx-auto py-10 px-6">
+
       <h1 className="text-4xl font-bold mb-8">
         Create New Post
       </h1>
 
+
       <form onSubmit={handleSubmit} className="space-y-4">
+
+
         <input
           className="w-full border p-3 rounded-lg"
           placeholder="Post title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
+
 
         <textarea
           className="w-full border p-3 rounded-lg h-64"
@@ -49,13 +89,37 @@ export default function CreatePostPage() {
           onChange={(e) => setContent(e.target.value)}
         />
 
+
+        <select
+          className="w-full border p-3 rounded-lg"
+          value={categoryId ?? ""}
+          onChange={(e) =>
+            setCategoryId(Number(e.target.value))
+          }
+        >
+
+          {categories.map((category) => (
+            <option
+              key={category.id}
+              value={category.id}
+            >
+              {category.name}
+            </option>
+          ))}
+
+        </select>
+
+
         <button
           type="submit"
           className="bg-blue-600 text-white px-6 py-3 rounded-lg"
         >
           Publish
         </button>
+
+
       </form>
+
     </main>
   );
 }

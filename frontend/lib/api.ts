@@ -3,6 +3,7 @@ const API_URL = "http://localhost:8000/api/v1";
 export async function createPost(post: {
   title: string;
   content: string;
+  category_id: number;
 }) {
   const response = await fetch(`${API_URL}/posts/`, {
     method: "POST",
@@ -169,6 +170,7 @@ export async function updatePost(
   post: {
     title: string;
     content: string;
+    category_id: number;
   }
 ) {
   const response = await fetch(`${API_URL}/posts/${id}`, {
@@ -182,6 +184,22 @@ export async function updatePost(
 
   if (!response.ok) {
     throw new Error("Failed to update post");
+  }
+
+  return response.json();
+}
+
+export async function getCategories() {
+  const response = await fetch(
+    `${API_URL}/categories/`,
+    {
+      cache: "no-store",
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to load categories");
   }
 
   return response.json();

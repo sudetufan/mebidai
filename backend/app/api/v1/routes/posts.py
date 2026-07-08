@@ -52,6 +52,7 @@ def create(
 def read_posts(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
+    category_id: int | None = Query(None),
     db: Session = Depends(get_db),
     current_user: User | None = Depends(get_optional_user),
 ):
@@ -60,6 +61,7 @@ def read_posts(
         current_user,
         page,
         limit,
+        category_id,
     )
 
 

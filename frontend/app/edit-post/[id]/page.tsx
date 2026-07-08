@@ -2,7 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { updatePost, getPost } from "@/lib/api";
+
+import {
+  updatePost,
+  getPost,
+  getCategories,
+} from "@/lib/api";
+
+
+type Category = {
+  id: number;
+  name: string;
+};
 
 
 export default function EditPostPage() {
@@ -15,14 +26,25 @@ export default function EditPostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+
+
 
   useEffect(() => {
-    async function loadPost() {
+    async function loadData() {
       try {
         const post = await getPost(String(id));
+        const categoryData = await getCategories();
+
 
         setTitle(post.title);
         setContent(post.content);
+
+        setCategoryId(post.category_id);
+
+        setCategories(categoryData);
+
 
       } catch (error) {
         console.error(error);
@@ -30,7 +52,8 @@ export default function EditPostPage() {
       }
     }
 
-    loadPost();
+
+    loadData();
 
   }, [id]);
 
@@ -41,11 +64,19 @@ export default function EditPostPage() {
   ) {
     e.preventDefault();
 
+
+    if (!categoryId) {
+      alert("Please select a category");
+      return;
+    }
+
+
     try {
 
       await updatePost(id, {
         title,
         content,
+        category_id: categoryId,
       });
 
 
@@ -67,6 +98,7 @@ export default function EditPostPage() {
   return (
     <main className="max-w-3xl mx-auto py-10 px-6">
 
+
       <h1 className="text-4xl font-bold mb-8">
         Edit Post
       </h1>
@@ -76,6 +108,7 @@ export default function EditPostPage() {
         onSubmit={handleSubmit}
         className="space-y-4"
       >
+
 
         <input
           className="w-full border p-3 rounded-lg"
@@ -95,6 +128,27 @@ export default function EditPostPage() {
         />
 
 
+        <select
+          className="w-full border p-3 rounded-lg"
+          value={categoryId ?? ""}
+          onChange={(e) =>
+            setCategoryId(Number(e.target.value))
+          }
+        >
+
+          {categories.map((category) => (
+            <option
+              key={category.id}
+              value={category.id}
+            >
+              {category.name}
+            </option>
+          ))}
+
+        </select>
+
+
+
         <button
           type="submit"
           className="bg-blue-600 text-white px-6 py-3 rounded-lg"
@@ -104,6 +158,7 @@ export default function EditPostPage() {
 
 
       </form>
+
 
     </main>
   );

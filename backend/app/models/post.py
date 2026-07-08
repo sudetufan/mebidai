@@ -7,20 +7,53 @@ from app.db.base import Base
 class Post(Base):
     __tablename__ = "posts"
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    content = Column(Text, nullable=False)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
 
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(
+        String,
+        nullable=False,
+    )
 
-    user = relationship("User", back_populates="posts")
+    content = Column(
+        Text,
+        nullable=False,
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False,
+    )
+
+    category_id = Column(
+        Integer,
+        ForeignKey("categories.id"),
+        nullable=False,
+    )
+
+
+    user = relationship(
+        "User",
+        back_populates="posts",
+    )
+
+    category = relationship(
+        "Category",
+        back_populates="posts",
+    )
+
     comments = relationship(
         "Comment",
         back_populates="post",
         cascade="all, delete-orphan",
     )
+
     likes = relationship(
-    "Like",
-    back_populates="post",
-    cascade="all, delete-orphan",
-)
+        "Like",
+        back_populates="post",
+        cascade="all, delete-orphan",
+    )

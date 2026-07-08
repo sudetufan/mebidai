@@ -12,9 +12,15 @@ type Post = {
   content: string;
   like_count: number;
   liked: boolean;
+
   user: {
     id: number;
     username: string;
+  };
+
+  category?: {
+    id: number;
+    name: string;
   };
 };
 
@@ -90,6 +96,7 @@ export default function BlogList({
             content={post.content}
             likeCount={post.like_count}
             liked={post.liked}
+            category={post.category}
           />
         ))
       )}

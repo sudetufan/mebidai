@@ -6,22 +6,32 @@ from app.api.v1.routes import (
     posts,
     comments,
     admin,
+    categories,
 )
+
 from app.db.base import Base
 from app.db.session import engine
+from app.seed import seed_categories
+
 from app.models import (
     user,
     post,
     comment,
     like,
+    category,
 )
 
+
 Base.metadata.create_all(bind=engine)
+
+seed_categories()
+
 
 app = FastAPI(
     title="MEBIDAI API",
     version="1.0.0",
 )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,10 +43,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(posts.router, prefix="/api/v1")
 app.include_router(comments.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
+app.include_router(categories.router, prefix="/api/v1")
 
 
 @app.get("/")
