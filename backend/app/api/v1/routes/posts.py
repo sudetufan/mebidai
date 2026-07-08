@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import (
@@ -12,6 +12,7 @@ from app.models.user import User
 from app.schemas.post import (
     PostCreate,
     PostResponse,
+    PaginatedPostsResponse,
 )
 
 from app.services.like_service import (
@@ -23,11 +24,10 @@ from app.services.post_service import (
     create_post,
     get_posts,
     get_post,
-    search_posts,
     update_post,
     delete_post,
+    search_posts,
 )
-
 
 router = APIRouter(
     prefix="/posts",
@@ -48,14 +48,18 @@ def create(
     )
 
 
-@router.get("/", response_model=list[PostResponse])
+@router.get("/", response_model=PaginatedPostsResponse)
 def read_posts(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user: User | None = Depends(get_optional_user),
 ):
     return get_posts(
         db,
         current_user,
+        page,
+        limit,
     )
 
 

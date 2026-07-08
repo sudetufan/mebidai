@@ -54,18 +54,34 @@ def create_post(
 def get_posts(
     db: Session,
     current_user: User | None,
+    page: int,
+    limit: int,
 ):
+    skip = (page - 1) * limit
+
+    total = db.query(Post).count()
+
     posts = (
         db.query(Post)
         .options(joinedload(Post.user))
+        .order_by(Post.id.desc())
+        .offset(skip)
+        .limit(limit)
         .all()
     )
 
-    return prepare_posts(
+    posts = prepare_posts(
         posts,
         db,
         current_user,
     )
+
+    return {
+        "posts": posts,
+        "total": total,
+        "page": page,
+        "limit": limit,
+    }
 
 
 def get_post(
@@ -208,6 +224,7 @@ def search_posts(
                 Post.content.ilike(f"%{query}%"),
             )
         )
+        .order_by(Post.id.desc())
         .all()
     )
 

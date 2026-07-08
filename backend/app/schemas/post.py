@@ -15,3 +15,10 @@ class PostResponse(PostCreate):
     liked: bool = False
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class PaginatedPostsResponse(BaseModel):
+    posts: list[PostResponse]
+    total: int
+    page: int
+    limit: int

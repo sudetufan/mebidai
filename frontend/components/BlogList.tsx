@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import PostCard from "./PostCard";
 import { getPosts, searchPosts } from "@/lib/api";
@@ -19,20 +20,32 @@ type Post = {
 
 type BlogListProps = {
   initialPosts: Post[];
+  initialPage: number;
+  total: number;
+  limit: number;
 };
 
 export default function BlogList({
   initialPosts,
+  initialPage,
+  total,
+  limit,
 }: BlogListProps) {
   const [posts, setPosts] = useState(initialPosts);
   const [query, setQuery] = useState("");
+
+  const totalPages = Math.ceil(total / limit);
+
+  useEffect(() => {
+    setPosts(initialPosts);
+  }, [initialPosts]);
 
   async function handleSearch() {
     const text = query.trim();
 
     if (text === "") {
-      const allPosts = await getPosts();
-      setPosts(allPosts);
+      const data = await getPosts();
+      setPosts(data.posts);
       return;
     }
 
@@ -59,6 +72,10 @@ export default function BlogList({
         </button>
       </div>
 
+      <p className="text-sm text-gray-500 mb-4">
+        Total Posts: {total} | Page: {initialPage} / {totalPages}
+      </p>
+
       {posts.length === 0 ? (
         <div className="text-center text-gray-500 py-10">
           No posts found.
@@ -76,6 +93,38 @@ export default function BlogList({
           />
         ))
       )}
+
+      <div className="flex justify-center items-center gap-4 mt-10">
+        {initialPage > 1 ? (
+          <Link
+            href={`/blog?page=${initialPage - 1}`}
+            className="px-4 py-2 border rounded-lg hover:bg-gray-100"
+          >
+            ← Previous
+          </Link>
+        ) : (
+          <span className="px-4 py-2 text-gray-400">
+            ← Previous
+          </span>
+        )}
+
+        <span className="font-semibold">
+          Page {initialPage} of {totalPages}
+        </span>
+
+        {initialPage < totalPages ? (
+          <Link
+            href={`/blog?page=${initialPage + 1}`}
+            className="px-4 py-2 border rounded-lg hover:bg-gray-100"
+          >
+            Next →
+          </Link>
+        ) : (
+          <span className="px-4 py-2 text-gray-400">
+            Next →
+          </span>
+        )}
+      </div>
     </>
   );
 }
