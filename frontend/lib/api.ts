@@ -1,6 +1,5 @@
 const API_URL = "http://localhost:8000/api/v1";
 
-
 export async function createPost(post: {
   title: string;
   content: string;
@@ -61,6 +60,19 @@ export async function loginUser(user: {
   return response.json();
 }
 
+export async function getPosts() {
+  const response = await fetch(`${API_URL}/posts/`, {
+    cache: "no-store",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to load posts");
+  }
+
+  return response.json();
+}
+
 export async function getPost(id: string) {
   const response = await fetch(`${API_URL}/posts/${id}`, {
     cache: "no-store",
@@ -69,6 +81,22 @@ export async function getPost(id: string) {
 
   if (!response.ok) {
     throw new Error("Post not found");
+  }
+
+  return response.json();
+}
+
+export async function searchPosts(query: string) {
+  const response = await fetch(
+    `${API_URL}/posts/search?q=${encodeURIComponent(query)}`,
+    {
+      cache: "no-store",
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to search posts");
   }
 
   return response.json();
@@ -143,17 +171,14 @@ export async function updatePost(
     content: string;
   }
 ) {
-  const response = await fetch(
-    `${API_URL}/posts/${id}`,
-    {
-      method: "PUT",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(post),
-    }
-  );
+  const response = await fetch(`${API_URL}/posts/${id}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(post),
+  });
 
   if (!response.ok) {
     throw new Error("Failed to update post");
