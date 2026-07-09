@@ -9,6 +9,10 @@ import {
   getCategories,
 } from "@/lib/api";
 
+import {
+  Save,
+} from "lucide-react";
+
 
 type Category = {
   id: number;
@@ -17,6 +21,7 @@ type Category = {
 
 
 export default function EditPostPage() {
+
   const router = useRouter();
   const params = useParams();
 
@@ -32,24 +37,29 @@ export default function EditPostPage() {
 
 
   useEffect(() => {
+
     async function loadData() {
+
       try {
+
         const post = await getPost(String(id));
         const categoryData = await getCategories();
 
 
         setTitle(post.title);
         setContent(post.content);
-
         setCategoryId(post.category_id);
-
         setCategories(categoryData);
 
 
-      } catch (error) {
+      } catch(error) {
+
         console.error(error);
+
         alert("Post could not be loaded.");
+
       }
+
     }
 
 
@@ -59,107 +69,228 @@ export default function EditPostPage() {
 
 
 
+
+
+
   async function handleSubmit(
     e: React.FormEvent
   ) {
+
     e.preventDefault();
 
 
     if (!categoryId) {
+
       alert("Please select a category");
+
       return;
+
     }
+
 
 
     try {
 
+
       await updatePost(id, {
+
         title,
         content,
         category_id: categoryId,
+
       });
+
 
 
       alert("Post updated successfully!");
 
+
       router.push("/dashboard");
 
 
-    } catch (error) {
+
+    } catch(error) {
+
 
       console.error(error);
+
       alert("Failed to update post.");
 
+
     }
+
   }
 
 
 
+
+
   return (
-    <main className="max-w-3xl mx-auto py-10 px-6">
+
+    <main className="mx-auto max-w-3xl px-6 py-12">
 
 
-      <h1 className="text-4xl font-bold mb-8">
-        Edit Post
-      </h1>
+      <div className="mb-8">
+
+        <h1 className="text-4xl font-extrabold tracking-tight">
+
+          Edit Post
+
+        </h1>
+
+
+        <p className="mt-3 text-gray-500">
+
+          Update your article and keep your content fresh.
+
+        </p>
+
+
+      </div>
+
+
+
+
 
 
       <form
+
         onSubmit={handleSubmit}
-        className="space-y-4"
+
+        className="space-y-6 rounded-3xl border bg-white p-8 shadow-sm"
+
       >
 
 
-        <input
-          className="w-full border p-3 rounded-lg"
-          value={title}
-          onChange={(e) =>
-            setTitle(e.target.value)
-          }
-        />
 
 
-        <textarea
-          className="w-full border p-3 rounded-lg h-64"
-          value={content}
-          onChange={(e) =>
-            setContent(e.target.value)
-          }
-        />
+        <div>
+
+          <label className="mb-2 block text-sm font-semibold">
+
+            Title
+
+          </label>
 
 
-        <select
-          className="w-full border p-3 rounded-lg"
-          value={categoryId ?? ""}
-          onChange={(e) =>
-            setCategoryId(Number(e.target.value))
-          }
-        >
+          <input
 
-          {categories.map((category) => (
-            <option
-              key={category.id}
-              value={category.id}
-            >
-              {category.name}
-            </option>
-          ))}
+            className="w-full rounded-xl border px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
 
-        </select>
+            value={title}
+
+            onChange={(e)=>
+              setTitle(e.target.value)
+            }
+
+          />
+
+        </div>
+
+
+
+
+
+
+        <div>
+
+          <label className="mb-2 block text-sm font-semibold">
+
+            Content
+
+          </label>
+
+
+          <textarea
+
+            className="h-64 w-full resize-none rounded-xl border px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+
+            value={content}
+
+            onChange={(e)=>
+              setContent(e.target.value)
+            }
+
+          />
+
+
+        </div>
+
+
+
+
+
+
+
+        <div>
+
+
+          <label className="mb-2 block text-sm font-semibold">
+
+            Category
+
+          </label>
+
+
+
+          <select
+
+            className="w-full rounded-xl border px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+
+            value={categoryId ?? ""}
+
+            onChange={(e)=>
+              setCategoryId(Number(e.target.value))
+            }
+
+          >
+
+            {categories.map((category)=>(
+
+              <option
+                key={category.id}
+                value={category.id}
+              >
+
+                {category.name}
+
+              </option>
+
+            ))}
+
+
+          </select>
+
+
+        </div>
+
+
+
 
 
 
         <button
+
           type="submit"
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg"
+
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700 hover:shadow-lg"
+
         >
-          Update
+
+          <Save size={18}/>
+
+          Update Post
+
+
         </button>
+
 
 
       </form>
 
 
     </main>
+
   );
+
 }

@@ -38,7 +38,6 @@ export default function LikeButton({
       }
 
 
-      // Sync page with backend response
       router.refresh();
 
 

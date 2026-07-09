@@ -1,65 +1,171 @@
 import { getComments } from "@/lib/api";
 import { serverFetch } from "@/lib/server-api";
+
 import CommentForm from "@/components/CommentForm";
 import CommentList from "@/components/CommentList";
 import LikeButton from "@/components/LikeButton";
 
+import {
+  User,
+  Heart,
+} from "lucide-react";
+
+
 export default async function PostDetailPage({ params }: any) {
+
   const { id } = await params;
 
   const post = await serverFetch(`/posts/${id}`);
   const comments = await getComments(id);
 
+
   return (
-    <main className="max-w-4xl mx-auto py-10 px-6">
 
-      <h1 className="text-4xl font-bold mb-3">
-        {post.title}
-      </h1>
+    <main className="mx-auto max-w-4xl px-6 py-12 space-y-8">
 
 
-      <div className="flex gap-3 items-center mb-6">
-
-        <p className="text-gray-500">
-          Author: {post.user?.username}
-        </p>
+      <section className="rounded-3xl border bg-white p-8 shadow-sm">
 
 
-        {post.category && (
-          <span className="bg-blue-100 text-blue-700 text-sm px-3 py-1 rounded-full">
-            {post.category.name}
-          </span>
-        )}
-
-      </div>
+        <div className="flex flex-wrap items-center gap-4">
 
 
-      <div className="bg-white rounded-xl shadow-md p-8 mb-6">
-        <p className="leading-8 text-lg text-gray-800">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 text-xl font-bold text-white">
+
+            {post.user?.username
+              ?.charAt(0)
+              .toUpperCase()}
+
+          </div>
+
+
+
+          <div>
+
+            <p className="font-semibold">
+
+              {post.user?.username ?? "Anonymous"}
+
+            </p>
+
+
+            <p className="text-sm text-gray-500">
+
+              Author
+
+            </p>
+
+          </div>
+
+
+
+
+          {post.category && (
+
+            <span className="rounded-full bg-blue-100 px-4 py-1 text-sm font-medium text-blue-700">
+
+              {post.category.name}
+
+            </span>
+
+          )}
+
+
+        </div>
+
+
+
+
+
+        <h1 className="mt-8 text-4xl font-extrabold tracking-tight">
+
+          {post.title}
+
+        </h1>
+
+
+
+
+      </section>
+
+
+
+
+
+      <article className="rounded-3xl border bg-white p-8 shadow-sm">
+
+
+        <p className="whitespace-pre-line text-lg leading-9 text-gray-700">
+
           {post.content}
+
         </p>
-      </div>
 
 
-      <div className="mb-10">
+      </article>
+
+
+
+
+
+      <section className="rounded-3xl border bg-white p-6 shadow-sm">
+
+
+        <div className="flex items-center gap-2 mb-4">
+
+          <Heart className="text-red-500"/>
+
+          <h2 className="text-xl font-bold">
+
+            Like this post
+
+          </h2>
+
+        </div>
+
+
+
         <LikeButton
           postId={post.id}
           initialLikes={post.like_count}
           initiallyLiked={post.liked}
         />
-      </div>
 
 
-      <div>
-        <h2 className="text-2xl font-bold mb-4">
+      </section>
+
+
+
+
+
+      <section className="rounded-3xl border bg-white p-8 shadow-sm">
+
+
+        <h2 className="mb-6 text-2xl font-bold">
+
           Comments
+
         </h2>
 
-        <CommentList comments={comments} />
 
-        <CommentForm postId={Number(id)} />
-      </div>
+
+        <CommentList comments={comments}/>
+
+
+
+        <div className="mt-8 border-t pt-6">
+
+          <CommentForm postId={Number(id)} />
+
+        </div>
+
+
+
+      </section>
+
+
 
     </main>
+
   );
 }

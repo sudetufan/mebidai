@@ -2,6 +2,7 @@ import "./globals.css";
 import Navbar from "../components/Navbar";
 import Providers from "./providers";
 import { Toaster } from "sonner";
+import Footer from "../components/Footer";
 
 export const metadata = {
   title: "MEBIDAI Community",
@@ -15,17 +16,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="min-h-screen flex flex-col">
+
         <Providers>
+
           <Navbar />
-          {children}
-          <Toaster
-            position="top-right"
-            richColors
-            closeButton
-            duration={2500}
-          />
+
+          <main className="flex-1">
+            {children}
+          </main>
+
+          <Footer />
+
         </Providers>
+
       </body>
     </html>
   );
