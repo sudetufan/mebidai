@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginUser } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 const API_URL = "http://localhost:8000/api/v1";
 
@@ -19,7 +20,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Please fill all fields");
+      toast.error("Please fill in all fields.");
       return;
     }
 
@@ -43,10 +44,12 @@ export default function LoginPage() {
       const user = await res.json();
       setUser(user);
 
+      toast.success("Welcome back!");
+
       router.push("/blog");
     } catch (error) {
       console.error(error);
-      alert("Invalid email or password.");
+      toast.error("Invalid email or password.");
     } finally {
       setLoading(false);
     }

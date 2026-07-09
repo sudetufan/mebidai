@@ -61,11 +61,32 @@ export async function loginUser(user: {
   return response.json();
 }
 
-export async function getPosts() {
-  const response = await fetch(`${API_URL}/posts/`, {
-    cache: "no-store",
-    credentials: "include",
-  });
+export async function getPosts(
+  page = 1,
+  limit = 10,
+  categoryId?: number,
+  query?: string
+) {
+  const params = new URLSearchParams();
+
+  params.append("page", String(page));
+  params.append("limit", String(limit));
+
+  if (categoryId) {
+    params.append("category_id", String(categoryId));
+  }
+
+  if (query && query.trim() !== "") {
+    params.append("q", query);
+  }
+
+  const response = await fetch(
+    `${API_URL}/posts/?${params.toString()}`,
+    {
+      cache: "no-store",
+      credentials: "include",
+    }
+  );
 
   if (!response.ok) {
     throw new Error("Failed to load posts");
@@ -87,9 +108,18 @@ export async function getPost(id: string) {
   return response.json();
 }
 
-export async function searchPosts(query: string) {
+export async function searchPosts(
+  query: string,
+  categoryId?: number
+) {
+  let url = `${API_URL}/posts/search?q=${encodeURIComponent(query)}`;
+
+  if (categoryId) {
+    url += `&category_id=${categoryId}`;
+  }
+
   const response = await fetch(
-    `${API_URL}/posts/search?q=${encodeURIComponent(query)}`,
+    url,
     {
       cache: "no-store",
       credentials: "include",
@@ -190,16 +220,43 @@ export async function updatePost(
 }
 
 export async function getCategories() {
-  const response = await fetch(
-    `${API_URL}/categories/`,
-    {
-      cache: "no-store",
-      credentials: "include",
-    }
-  );
+  const response = await fetch(`${API_URL}/categories/`, {
+    cache: "no-store",
+    credentials: "include",
+  });
 
   if (!response.ok) {
     throw new Error("Failed to load categories");
+  }
+
+  return response.json();
+}
+
+export async function createCategory(name: string) {
+  const response = await fetch(`${API_URL}/categories/`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create category");
+  }
+
+  return response.json();
+}
+
+export async function deleteCategory(id: number) {
+  const response = await fetch(`${API_URL}/categories/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete category");
   }
 
   return response.json();

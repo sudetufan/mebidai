@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import Providers from "./providers";
+import { Toaster } from "sonner";
 
 export const metadata = {
   title: "MEBIDAI Community",
@@ -18,6 +19,12 @@ export default function RootLayout({
         <Providers>
           <Navbar />
           {children}
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            duration={2500}
+          />
         </Providers>
       </body>
     </html>

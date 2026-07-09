@@ -12,24 +12,35 @@ export default async function PostDetailPage({ params }: any) {
 
   return (
     <main className="max-w-4xl mx-auto py-10 px-6">
-      {/* TITLE */}
+
       <h1 className="text-4xl font-bold mb-3">
         {post.title}
       </h1>
 
-      {/* AUTHOR */}
-      <p className="text-gray-500 mb-6">
-        Author: {post.user?.username}
-      </p>
 
-      {/* CONTENT */}
+      <div className="flex gap-3 items-center mb-6">
+
+        <p className="text-gray-500">
+          Author: {post.user?.username}
+        </p>
+
+
+        {post.category && (
+          <span className="bg-blue-100 text-blue-700 text-sm px-3 py-1 rounded-full">
+            {post.category.name}
+          </span>
+        )}
+
+      </div>
+
+
       <div className="bg-white rounded-xl shadow-md p-8 mb-6">
         <p className="leading-8 text-lg text-gray-800">
           {post.content}
         </p>
       </div>
 
-      {/* LIKE */}
+
       <div className="mb-10">
         <LikeButton
           postId={post.id}
@@ -38,7 +49,7 @@ export default async function PostDetailPage({ params }: any) {
         />
       </div>
 
-      {/* COMMENTS */}
+
       <div>
         <h2 className="text-2xl font-bold mb-4">
           Comments
@@ -48,6 +59,7 @@ export default async function PostDetailPage({ params }: any) {
 
         <CommentForm postId={Number(id)} />
       </div>
+
     </main>
   );
 }

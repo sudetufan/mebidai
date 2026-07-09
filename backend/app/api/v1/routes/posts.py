@@ -53,6 +53,7 @@ def read_posts(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     category_id: int | None = Query(None),
+    q: str | None = Query(None),
     db: Session = Depends(get_db),
     current_user: User | None = Depends(get_optional_user),
 ):
@@ -62,12 +63,14 @@ def read_posts(
         page,
         limit,
         category_id,
+        q,
     )
 
 
 @router.get("/search", response_model=list[PostResponse])
 def search(
     q: str,
+    category_id: int | None = Query(None),
     db: Session = Depends(get_db),
     current_user: User | None = Depends(get_optional_user),
 ):
@@ -75,6 +78,7 @@ def search(
         db,
         q,
         current_user,
+        category_id,
     )
 
 

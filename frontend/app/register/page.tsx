@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/lib/api";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -10,23 +11,33 @@ export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    if (!username || !email || !password) {
+      toast.error("Please fill in all fields.");
+      return;
+    }
+
     try {
+      setLoading(true);
+
       await registerUser({
         username,
         email,
         password,
       });
 
-      alert("Account created successfully!");
+      toast.success("Account created successfully!");
 
       router.push("/login");
     } catch (error) {
       console.error(error);
-      alert("Registration failed.");
+      toast.error("Registration failed.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -63,9 +74,10 @@ export default function RegisterPage() {
 
         <button
           type="submit"
-          className="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700"
+          disabled={loading}
+          className="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 disabled:opacity-50"
         >
-          Create Account
+          {loading ? "Creating account..." : "Create Account"}
         </button>
       </form>
     </main>

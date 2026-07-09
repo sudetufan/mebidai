@@ -22,9 +22,15 @@ export default async function BlogPage({
 
   return (
     <main className="max-w-5xl mx-auto px-6 py-10">
-      <h1 className="text-4xl font-bold mb-8">
-        Community Blog
-      </h1>
+      <div className="mb-10">
+        <h1 className="text-4xl font-bold text-gray-900">
+          Community Blog
+        </h1>
+
+        <p className="mt-2 text-gray-600">
+          Discover, share and discuss ideas with the community.
+        </p>
+      </div>
 
       <BlogList
         initialPosts={data.posts}

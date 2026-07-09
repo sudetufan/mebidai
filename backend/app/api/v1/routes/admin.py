@@ -55,9 +55,11 @@ def read_posts(
     admin: User = Depends(get_admin_user),
 ):
     return get_posts(
-        db,
-        admin,
-    )
+        db=db,
+        current_user=admin,
+        page=1,
+        limit=1000,
+    )["posts"]
 
 
 

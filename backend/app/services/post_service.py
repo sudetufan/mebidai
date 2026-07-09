@@ -55,57 +55,74 @@ def create_post(
     return new_post
 
 
-
 def get_posts(
     db: Session,
     current_user: User | None,
     page: int,
     limit: int,
     category_id: int | None = None,
+    query: str | None = None,
 ):
 
     skip = (page - 1) * limit
 
-    total_query = db.query(Post)
+    total_query = (
+        db.query(Post)
+        .join(Category)
+    )
 
     if category_id:
         total_query = total_query.filter(
             Post.category_id == category_id
         )
 
+    if query:
+        total_query = total_query.filter(
+            or_(
+                Post.title.ilike(f"%{query}%"),
+                Post.content.ilike(f"%{query}%"),
+                Category.name.ilike(f"%{query}%"),
+            )
+        )
+
     total = total_query.count()
 
-
-    query = (
+    posts_query = (
         db.query(Post)
+        .join(Category)
         .options(
             joinedload(Post.user),
             joinedload(Post.category),
         )
     )
 
-
     if category_id:
-        query = query.filter(
+        posts_query = posts_query.filter(
             Post.category_id == category_id
         )
 
+    if query:
+        posts_query = posts_query.filter(
+            or_(
+                Post.title.ilike(f"%{query}%"),
+                Post.content.ilike(f"%{query}%"),
+                Category.name.ilike(f"%{query}%"),
+            )
+        )
 
     posts = (
-        query
+        posts_query
         .order_by(Post.id.desc())
         .offset(skip)
         .limit(limit)
         .all()
     )
 
-
     posts = prepare_posts(
         posts,
         db,
         current_user,
     )
-
 
     return {
         "posts": posts,
@@ -271,21 +288,28 @@ def get_user_posts(
         None,
     )
 
-
-
 def search_posts(
     db: Session,
     query: str,
     current_user: User | None,
+    category_id: int | None = None,
 ):
-
-    posts = (
+    posts_query = (
         db.query(Post)
         .join(Category)
         .options(
             joinedload(Post.user),
             joinedload(Post.category),
         )
+    )
+
+    if category_id:
+        posts_query = posts_query.filter(
+            Post.category_id == category_id
+        )
+
+    posts = (
+        posts_query
         .filter(
             or_(
                 Post.title.ilike(f"%{query}%"),
@@ -296,7 +320,6 @@ def search_posts(
         .order_by(Post.id.desc())
         .all()
     )
-
 
     return prepare_posts(
         posts,
