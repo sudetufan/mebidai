@@ -1,5 +1,32 @@
 const API_URL = "http://localhost:8000/api/v1";
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
+async function handleResponse(response: Response) {
+  if (!response.ok) {
+    let message = "Something went wrong";
+
+    try {
+      const data = await response.json();
+
+      if (data.detail) {
+        message = data.detail;
+      }
+    } catch {}
+
+    throw new ApiError(message, response.status);
+  }
+
+  return response.json();
+}
+
 export async function createPost(post: {
   title: string;
   content: string;
@@ -14,11 +41,7 @@ export async function createPost(post: {
     body: JSON.stringify(post),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to create post");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function registerUser(user: {
@@ -34,11 +57,7 @@ export async function registerUser(user: {
     body: JSON.stringify(user),
   });
 
-  if (!response.ok) {
-    throw new Error("Registration failed");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function loginUser(user: {
@@ -54,11 +73,7 @@ export async function loginUser(user: {
     body: JSON.stringify(user),
   });
 
-  if (!response.ok) {
-    throw new Error("Login failed");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function getPosts(
@@ -88,11 +103,7 @@ export async function getPosts(
     }
   );
 
-  if (!response.ok) {
-    throw new Error("Failed to load posts");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function getPost(id: string) {
@@ -101,11 +112,7 @@ export async function getPost(id: string) {
     credentials: "include",
   });
 
-  if (!response.ok) {
-    throw new Error("Post not found");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function searchPosts(
@@ -118,19 +125,12 @@ export async function searchPosts(
     url += `&category_id=${categoryId}`;
   }
 
-  const response = await fetch(
-    url,
-    {
-      cache: "no-store",
-      credentials: "include",
-    }
-  );
+  const response = await fetch(url, {
+    cache: "no-store",
+    credentials: "include",
+  });
 
-  if (!response.ok) {
-    throw new Error("Failed to search posts");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function getComments(postId: string) {
@@ -142,11 +142,7 @@ export async function getComments(postId: string) {
     }
   );
 
-  if (!response.ok) {
-    throw new Error("Failed to load comments");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function createComment(comment: {
@@ -162,11 +158,7 @@ export async function createComment(comment: {
     body: JSON.stringify(comment),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to create comment");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function likePost(postId: number) {
@@ -175,11 +167,7 @@ export async function likePost(postId: number) {
     credentials: "include",
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to like post");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function unlikePost(postId: number) {
@@ -188,11 +176,7 @@ export async function unlikePost(postId: number) {
     credentials: "include",
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to unlike post");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function updatePost(
@@ -212,11 +196,7 @@ export async function updatePost(
     body: JSON.stringify(post),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to update post");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function getCategories() {
@@ -225,11 +205,7 @@ export async function getCategories() {
     credentials: "include",
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to load categories");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function createCategory(name: string) {
@@ -242,11 +218,7 @@ export async function createCategory(name: string) {
     body: JSON.stringify({ name }),
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to create category");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function deleteCategory(id: number) {
@@ -255,9 +227,40 @@ export async function deleteCategory(id: number) {
     credentials: "include",
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to delete category");
-  }
+  return handleResponse(response);
+}
+export async function updateComment(
+  id: number,
+  content: string
+) {
+  const response = await fetch(
+    `${API_URL}/comments/${id}`,
+    {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content,
+      }),
+    }
+  );
 
-  return response.json();
+  return handleResponse(response);
+}
+
+export async function googleLogin(token: string) {
+  const response = await fetch(`${API_URL}/users/google-login`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      token,
+    }),
+  });
+
+  return handleResponse(response);
 }

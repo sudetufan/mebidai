@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
+
 import { useAuth } from "@/context/AuthContext";
+import {
+  updateComment,
+  ApiError,
+} from "@/lib/api";
 
 type Props = {
   comments: any[];
@@ -14,25 +19,27 @@ export default function CommentList({ comments }: Props) {
   const [content, setContent] = useState("");
 
   async function handleSave() {
-    const response = await fetch(
-      `http://localhost:8000/api/v1/comments/${editingId}`,
-      {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content,
-        }),
-      }
-    );
+    if (!editingId || !content.trim()) {
+      alert("Comment cannot be empty.");
+      return;
+    }
 
-    if (response.ok) {
+    try {
+      await updateComment(
+        editingId,
+        content
+      );
+
       setEditingId(null);
+
       window.location.reload();
-    } else {
-      alert("Yorum güncellenemedi.");
+
+    } catch (error) {
+      if (error instanceof ApiError) {
+        alert(error.message);
+      } else {
+        alert("Comment could not be updated.");
+      }
     }
   }
 
@@ -88,7 +95,9 @@ export default function CommentList({ comments }: Props) {
                 </>
               ) : (
                 <>
-                  <p>{comment.content}</p>
+                  <p>
+                    {comment.content}
+                  </p>
 
                   {canEdit && (
                     <button

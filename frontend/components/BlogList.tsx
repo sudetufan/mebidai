@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { SearchX } from "lucide-react";
 
 import PostCard from "./PostCard";
+
 import {
   getPosts,
   searchPosts,
   getCategories,
+  ApiError,
 } from "@/lib/api";
 
 type Post = {
@@ -46,8 +48,10 @@ export default function BlogList({
   limit,
 }: BlogListProps) {
   const [posts, setPosts] = useState(initialPosts);
+
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<
@@ -62,9 +66,15 @@ export default function BlogList({
     async function loadCategories() {
       try {
         const data = await getCategories();
+
         setCategories(data);
+
       } catch (error) {
-        console.error(error);
+        if (error instanceof ApiError) {
+          setError(error.message);
+        } else {
+          setError("Failed to load categories.");
+        }
       }
     }
 
@@ -75,6 +85,7 @@ export default function BlogList({
     const timer = setTimeout(async () => {
       try {
         setLoading(true);
+        setError("");
 
         if (query.trim() === "") {
           const data = await getPosts(
@@ -84,6 +95,7 @@ export default function BlogList({
           );
 
           setPosts(data.posts);
+
         } else {
           const results = await searchPosts(
             query,
@@ -92,14 +104,21 @@ export default function BlogList({
 
           setPosts(results);
         }
+
       } catch (error) {
-        console.error(error);
+        if (error instanceof ApiError) {
+          setError(error.message);
+        } else {
+          setError("Failed to load posts.");
+        }
+
       } finally {
         setLoading(false);
       }
     }, 400);
 
     return () => clearTimeout(timer);
+
   }, [query, selectedCategory, limit]);
 
   function handleCategoryChange(categoryId?: number) {
@@ -113,6 +132,7 @@ export default function BlogList({
       <div className="mb-2 h-4 w-40 rounded bg-gray-200" />
       <div className="mb-2 h-4 w-full rounded bg-gray-200" />
       <div className="mb-2 h-4 w-5/6 rounded bg-gray-200" />
+
       <div className="mt-6 flex justify-between">
         <div className="h-6 w-16 rounded bg-gray-200" />
         <div className="h-6 w-24 rounded bg-gray-200" />
@@ -122,6 +142,12 @@ export default function BlogList({
 
   return (
     <>
+      {error && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+          {error}
+        </div>
+      )}
+
       <div className="mb-4">
         <input
           type="text"
@@ -178,8 +204,7 @@ export default function BlogList({
           </h3>
 
           <p className="mt-2 max-w-sm text-center text-gray-500">
-            We couldn't find any posts matching your search or selected
-            category.
+            We couldn't find any posts matching your search or selected category.
           </p>
 
           <button

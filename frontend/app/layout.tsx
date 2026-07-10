@@ -1,12 +1,40 @@
 import "./globals.css";
+
 import Navbar from "../components/Navbar";
-import Providers from "./providers";
-import { Toaster } from "sonner";
 import Footer from "../components/Footer";
+import Providers from "./providers";
+
+import { Toaster } from "sonner";
 
 export const metadata = {
-  title: "MEBIDAI Community",
-  description: "Build. Share. Learn.",
+  title: {
+    default: "MEBIDAI Community",
+    template: "%s | MEBIDAI",
+  },
+
+  description:
+    "MEBIDAI is a community platform where users share knowledge, articles and ideas.",
+
+  keywords: [
+    "MEBIDAI",
+    "community",
+    "blog",
+    "technology",
+    "knowledge sharing",
+  ],
+
+  authors: [
+    {
+      name: "MEBIDAI Team",
+    },
+  ],
+
+  openGraph: {
+    title: "MEBIDAI Community",
+    description:
+      "Build. Share. Learn. A platform for knowledge sharing.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -17,7 +45,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">
-
         <Providers>
 
           <Navbar />
@@ -28,8 +55,12 @@ export default function RootLayout({
 
           <Footer />
 
-        </Providers>
+          <Toaster
+            position="bottom-right"
+            duration={3000}
+          />
 
+        </Providers>
       </body>
     </html>
   );

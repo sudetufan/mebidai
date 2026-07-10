@@ -8,9 +8,20 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
+
+    # Normal kayıt olan kullanıcılar için
+    # Google kullanıcılarında boş olabilir
+    hashed_password = Column(String, nullable=True)
+
+    # Google OAuth için
+    google_id = Column(String, unique=True, nullable=True)
+
+    # Kullanıcı giriş tipi
+    # local veya google olacak
+    provider = Column(String, default="local")
 
     role = Column(String, default="user")
 
@@ -25,8 +36,9 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+
     likes = relationship(
-    "Like",
-    back_populates="user",
-    cascade="all, delete-orphan",
-)
+        "Like",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )

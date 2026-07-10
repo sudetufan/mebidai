@@ -4,12 +4,14 @@ from sqlalchemy.orm import Session
 from app.models.post import Post
 from app.models.comment import Comment
 from app.models.like import Like
+from app.models.user import User
+
 from app.security import (
     hash_password,
     verify_password,
     create_access_token,
 )
-from app.models.user import User
+
 from app.schemas.user import UserCreate
 
 
@@ -17,6 +19,7 @@ def create_user(
     db: Session,
     user: UserCreate,
 ) -> User:
+
     existing_user = (
         db.query(User)
         .filter(User.email == user.email)
@@ -48,6 +51,7 @@ def login_user(
     email: str,
     password: str,
 ) -> str:
+
     user = (
         db.query(User)
         .filter(User.email == email)
@@ -68,6 +72,48 @@ def login_user(
             status_code=401,
             detail="Invalid email or password",
         )
+    return create_access_token(
+        data={"sub": user.email}
+    )
+
+def google_login_user(
+    db: Session,
+    google_data: dict,
+) -> str:
+    email = google_data.get("email")
+    google_id = google_data.get("sub")
+    username = google_data.get("name")
+    if not email or not google_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid Google account data",
+        )
+    user = (
+        db.query(User)
+        .filter(User.email == email)
+        .first()
+    )
+    if not user:
+        username = username.replace(" ", "_").lower()
+        existing_username = (
+            db.query(User)
+            .filter(User.username == username)
+            .first()
+        )
+        if existing_username:
+            username = f"{username}_{google_id[:5]}"
+        user = User(
+            username=username,
+            email=email,
+            google_id=google_id,
+            provider="google",
+            hashed_password=None,
+        )
+
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
 
     return create_access_token(
         data={"sub": user.email}
@@ -85,6 +131,7 @@ def delete_user(
     user_id: int,
     current_user: User,
 ):
+
     user = (
         db.query(User)
         .filter(User.id == user_id)
@@ -97,17 +144,20 @@ def delete_user(
             detail="User not found",
         )
 
+
     if user.id == current_user.id:
         raise HTTPException(
             status_code=400,
             detail="You cannot delete your own account",
         )
 
+
     if user.role == "admin":
         raise HTTPException(
             status_code=400,
             detail="Admin users cannot be deleted",
         )
+
 
     db.delete(user)
     db.commit()
@@ -129,8 +179,6 @@ def get_profile(
         )
         .count()
     )
-
-
     comment_count = (
         db.query(Comment)
         .filter(
@@ -138,8 +186,6 @@ def get_profile(
         )
         .count()
     )
-
-
     like_count = (
         db.query(Like)
         .join(Post)
@@ -148,8 +194,6 @@ def get_profile(
         )
         .count()
     )
-
-
     return {
         "id": current_user.id,
         "username": current_user.username,

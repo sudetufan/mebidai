@@ -2,43 +2,48 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
 import {
   User,
   Mail,
   Lock,
 } from "lucide-react";
 
-import { registerUser } from "@/lib/api";
+import { registerUser, ApiError } from "@/lib/api";
 
 export default function RegisterPage() {
-
   const router = useRouter();
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  async function handleSubmit(
-    e: React.FormEvent
-  ) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!username || !email || !password) {
+      alert("Please fill all fields");
+      return;
+    }
+
     try {
       await registerUser({
         username,
         email,
         password,
       });
-      alert(
-        "Account created successfully!"
-      );
+
+      alert("Account created successfully!");
       router.push("/login");
-    } catch(error) {
-      console.error(error);
-      alert(
-        "Registration failed."
-      );
+
+    } catch (error) {
+      if (error instanceof ApiError) {
+        alert(error.message);
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
     }
   }
+
   return (
     <main className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
       <div className="w-full max-w-md">
@@ -46,13 +51,13 @@ export default function RegisterPage() {
           <h1 className="text-4xl font-extrabold text-slate-900">
             Create Account
           </h1>
+
           <p className="mt-3 text-gray-500">
             Join MEBIDAI and start sharing knowledge.
           </p>
         </div>
 
         <div className="bg-white rounded-3xl shadow-lg p-8">
-
           <button
             type="button"
             className="w-full flex items-center justify-center gap-3 border rounded-xl py-3 font-semibold hover:bg-gray-50 transition"
@@ -62,13 +67,17 @@ export default function RegisterPage() {
             </span>
             Continue with Google
           </button>
+
           <div className="flex items-center gap-4 my-6">
             <div className="h-px bg-gray-200 flex-1" />
+
             <span className="text-sm text-gray-400">
               OR
             </span>
+
             <div className="h-px bg-gray-200 flex-1" />
           </div>
+
           <form
             onSubmit={handleSubmit}
             className="space-y-5"
@@ -77,22 +86,23 @@ export default function RegisterPage() {
               <label className="text-sm font-semibold">
                 Username
               </label>
+
               <div className="relative mt-2">
                 <User
                   size={18}
                   className="absolute left-3 top-3.5 text-gray-400"
                 />
+
                 <input
                   type="text"
                   placeholder="Username"
                   className="w-full rounded-xl border pl-10 pr-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   value={username}
-                  onChange={(e)=>
-                    setUsername(e.target.value)
-                  }
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </div>
             </div>
+
             <div>
               <label className="text-sm font-semibold">
                 Email
@@ -103,14 +113,13 @@ export default function RegisterPage() {
                   size={18}
                   className="absolute left-3 top-3.5 text-gray-400"
                 />
+
                 <input
                   type="email"
                   placeholder="Email address"
                   className="w-full rounded-xl border pl-10 pr-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   value={email}
-                  onChange={(e)=>
-                    setEmail(e.target.value)
-                  }
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
@@ -119,22 +128,23 @@ export default function RegisterPage() {
               <label className="text-sm font-semibold">
                 Password
               </label>
+
               <div className="relative mt-2">
                 <Lock
                   size={18}
                   className="absolute left-3 top-3.5 text-gray-400"
                 />
+
                 <input
                   type="password"
                   placeholder="Password"
                   className="w-full rounded-xl border pl-10 pr-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   value={password}
-                  onChange={(e)=>
-                    setPassword(e.target.value)
-                  }
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
+
             <button
               type="submit"
               className="w-full rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 transition"
@@ -142,6 +152,7 @@ export default function RegisterPage() {
               Create Account
             </button>
           </form>
+
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{" "}
             <a
@@ -155,5 +166,4 @@ export default function RegisterPage() {
       </div>
     </main>
   );
-
 }
