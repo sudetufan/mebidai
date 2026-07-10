@@ -19,6 +19,7 @@ from app.models import (
     comment,
     like,
     category,
+    follow,
 )
 
 

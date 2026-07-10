@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, Response, HTTPException
 from sqlalchemy.orm import Session
-
 from app.models.user import User
-
 from app.api.dependencies import (
     get_db,
     get_admin_user,
@@ -13,6 +11,7 @@ from app.schemas.user import (
     UserCreate,
     UserLogin,
     UserProfile,
+    UserMini,
 )
 
 from app.schemas.post import PostResponse
@@ -22,6 +21,10 @@ from app.services.user_service import (
     login_user,
     google_login_user,
     get_profile,
+    follow_user,
+    unfollow_user,
+    get_followers,
+    get_following,
 )
 
 from app.services.google_service import (
@@ -37,16 +40,12 @@ router = APIRouter(
     prefix="/users",
     tags=["Users"],
 )
-
-
 @router.post("/register")
 def register(
     user: UserCreate,
     db: Session = Depends(get_db),
 ):
     return create_user(db, user)
-
-
 
 @router.post("/login")
 def login(
@@ -60,8 +59,6 @@ def login(
         user.email,
         user.password,
     )
-
-
     response.set_cookie(
         key="access_token",
         value=access_token,
@@ -76,8 +73,6 @@ def login(
         "message": "Login successful"
     }
 
-
-
 @router.post("/google-login")
 def google_login(
     data: dict,
@@ -86,30 +81,21 @@ def google_login(
 ):
 
     token = data.get("token")
-
-
     if not token:
         raise HTTPException(
             status_code=400,
             detail="Google token is required",
         )
-
-
     google_user = verify_google_token(token)
-
-
     if not google_user:
         raise HTTPException(
             status_code=401,
             detail="Invalid Google token",
         )
-
-
     access_token = google_login_user(
         db,
         google_user,
     )
-
 
     response.set_cookie(
         key="access_token",
@@ -119,13 +105,9 @@ def google_login(
         secure=False,
         path="/",
     )
-
-
     return {
         "message": "Google login successful"
     }
-
-
 
 @router.get("/me")
 def me(
@@ -137,8 +119,6 @@ def me(
         "email": current_user.email,
         "role": current_user.role,
     }
-
-
 
 @router.get(
     "/profile",
@@ -152,9 +132,6 @@ def profile(
         db,
         current_user,
     )
-
-
-
 @router.get(
     "/profile/posts",
     response_model=list[PostResponse],
@@ -169,8 +146,6 @@ def profile_posts(
         current_user.id,
     )
 
-
-
 @router.post("/logout")
 def logout(response: Response):
 
@@ -178,12 +153,9 @@ def logout(response: Response):
         "access_token",
         path="/",
     )
-
     return {
         "message": "Logged out"
     }
-
-
 
 @router.get("/admin-test")
 def admin_test(
@@ -193,3 +165,56 @@ def admin_test(
     return {
         "message": f"Welcome Admin {admin.username}"
     }
+
+@router.post("/{user_id}/follow")
+def follow(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return follow_user(
+        db,
+        current_user,
+        user_id,
+    )
+
+
+@router.delete("/{user_id}/follow")
+def unfollow(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return unfollow_user(
+        db,
+        current_user,
+        user_id,
+    )
+
+
+@router.get(
+    "/{user_id}/followers",
+    response_model=list[UserMini],
+)
+def followers(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    return get_followers(
+        db,
+        user_id,
+    )
+
+
+@router.get(
+    "/{user_id}/following",
+    response_model=list[UserMini],
+)
+def following(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    return get_following(
+        db,
+        user_id,
+    )

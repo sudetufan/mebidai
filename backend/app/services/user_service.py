@@ -1,11 +1,11 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-
+from app.schemas.user import UserCreate
 from app.models.post import Post
 from app.models.comment import Comment
 from app.models.like import Like
 from app.models.user import User
-
+from app.models.follow import Follow
 from app.security import (
     hash_password,
     verify_password,
@@ -203,3 +203,115 @@ def get_profile(
         "comment_count": comment_count,
         "like_count": like_count,
     }
+
+def follow_user(
+    db: Session,
+    current_user: User,
+    target_user_id: int,
+):
+    if current_user.id == target_user_id:
+        raise HTTPException(
+            status_code=400,
+            detail="You cannot follow yourself",
+        )
+
+    target_user = (
+        db.query(User)
+        .filter(User.id == target_user_id)
+        .first()
+    )
+
+    if not target_user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+
+    existing_follow = (
+        db.query(Follow)
+        .filter(
+            Follow.follower_id == current_user.id,
+            Follow.following_id == target_user_id,
+        )
+        .first()
+    )
+
+    if existing_follow:
+        raise HTTPException(
+            status_code=400,
+            detail="Already following this user",
+        )
+
+    follow = Follow(
+        follower_id=current_user.id,
+        following_id=target_user_id,
+    )
+
+    db.add(follow)
+    db.commit()
+
+    return {
+        "message": "User followed successfully"
+    }
+
+
+def unfollow_user(
+    db: Session,
+    current_user: User,
+    target_user_id: int,
+):
+    follow = (
+        db.query(Follow)
+        .filter(
+            Follow.follower_id == current_user.id,
+            Follow.following_id == target_user_id,
+        )
+        .first()
+    )
+
+    if not follow:
+        raise HTTPException(
+            status_code=404,
+            detail="Follow relationship not found",
+        )
+
+    db.delete(follow)
+    db.commit()
+
+    return {
+        "message": "User unfollowed successfully"
+    }
+
+
+def get_followers(
+    db: Session,
+    user_id: int,
+):
+    return (
+        db.query(User)
+        .join(
+            Follow,
+            Follow.follower_id == User.id,
+        )
+        .filter(
+            Follow.following_id == user_id,
+        )
+        .all()
+    )
+
+
+def get_following(
+    db: Session,
+    user_id: int,
+):
+    return (
+        db.query(User)
+        .join(
+            Follow,
+            Follow.following_id == User.id,
+        )
+        .filter(
+            Follow.follower_id == user_id,
+        )
+        .all()
+    )

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-
+from app.models.follow import Follow
 
 class UserCreate(BaseModel):
     username: str
@@ -55,3 +55,4 @@ class UserSimple(BaseModel):
 
     class Config:
         from_attributes = True
+
