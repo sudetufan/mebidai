@@ -264,3 +264,59 @@ export async function googleLogin(token: string) {
 
   return handleResponse(response);
 }
+export async function getUserProfile(userId: number) {
+  const response = await fetch(
+    `${API_URL}/users/${userId}`,
+    {
+      cache: "no-store",
+      credentials: "include",
+    }
+  );
+
+  return handleResponse(response);
+}
+
+export async function getUserPosts(userId: number) {
+  const response = await fetch(
+    `${API_URL}/users/${userId}/posts`,
+    {
+      cache: "no-store",
+      credentials: "include",
+    }
+  );
+
+  return handleResponse(response);
+}
+
+export async function followUser(userId: string) {
+  const response = await fetch(
+    `${API_URL}/users/${userId}/follow`,
+    {
+      method: "POST",
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Follow failed");
+  }
+
+  return response.json();
+}
+
+
+export async function unfollowUser(userId: string) {
+  const response = await fetch(
+    `${API_URL}/users/${userId}/follow`,
+    {
+      method: "DELETE",
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Unfollow failed");
+  }
+
+  return response.json();
+}

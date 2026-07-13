@@ -5,6 +5,7 @@ import { User } from "lucide-react";
 type PostCardProps = {
   id: number;
   title: string;
+  authorId: number;
   author?: string;
   content: string;
   likeCount: number;
@@ -18,6 +19,7 @@ type PostCardProps = {
 export default function PostCard({
   id,
   title,
+  authorId,
   author,
   content,
   likeCount,
@@ -58,7 +60,6 @@ export default function PostCard({
             Read More →
           </span>
         </div>
-
       </article>
     </Link>
   );

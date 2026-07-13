@@ -11,7 +11,7 @@ from app.security import (
     verify_password,
     create_access_token,
 )
-
+from sqlalchemy import func
 from app.schemas.user import UserCreate
 
 
@@ -174,26 +174,35 @@ def get_profile(
 ):
     post_count = (
         db.query(Post)
-        .filter(
-            Post.user_id == current_user.id
-        )
+        .filter(Post.user_id == current_user.id)
         .count()
     )
+
     comment_count = (
         db.query(Comment)
-        .filter(
-            Comment.user_id == current_user.id
-        )
+        .filter(Comment.user_id == current_user.id)
         .count()
     )
+
     like_count = (
         db.query(Like)
         .join(Post)
-        .filter(
-            Post.user_id == current_user.id
-        )
+        .filter(Post.user_id == current_user.id)
         .count()
     )
+
+    followers_count = (
+        db.query(Follow)
+        .filter(Follow.following_id == current_user.id)
+        .count()
+    )
+
+    following_count = (
+        db.query(Follow)
+        .filter(Follow.follower_id == current_user.id)
+        .count()
+    )
+
     return {
         "id": current_user.id,
         "username": current_user.username,
@@ -202,6 +211,9 @@ def get_profile(
         "post_count": post_count,
         "comment_count": comment_count,
         "like_count": like_count,
+        "followers_count": followers_count,
+        "following_count": following_count,
+        "is_following": False,
     }
 
 def follow_user(
@@ -313,5 +325,91 @@ def get_following(
         .filter(
             Follow.follower_id == user_id,
         )
+        .all()
+    )
+
+def get_user_profile(
+    db: Session,
+    current_user: User,
+    user_id: int,
+):
+    user = (
+        db.query(User)
+        .filter(User.id == user_id)
+        .first()
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+
+    post_count = (
+        db.query(Post)
+        .filter(Post.user_id == user.id)
+        .count()
+    )
+
+    comment_count = (
+        db.query(Comment)
+        .filter(Comment.user_id == user.id)
+        .count()
+    )
+
+    like_count = (
+        db.query(Like)
+        .join(Post)
+        .filter(Post.user_id == user.id)
+        .count()
+    )
+
+    followers_count = (
+        db.query(Follow)
+        .filter(Follow.following_id == user.id)
+        .count()
+    )
+
+    following_count = (
+        db.query(Follow)
+        .filter(Follow.follower_id == user.id)
+        .count()
+    )
+
+    is_following = (
+        db.query(Follow)
+        .filter(
+            Follow.follower_id == current_user.id,
+            Follow.following_id == user.id,
+        )
+        .first()
+        is not None
+    )
+
+    return {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "role": user.role,
+        "post_count": post_count,
+        "comment_count": comment_count,
+        "like_count": like_count,
+        "followers_count": followers_count,
+        "following_count": following_count,
+        "is_following": is_following,
+    }
+
+def search_users(
+    db: Session,
+    query: str,
+    current_user: User,
+):
+    return (
+        db.query(User)
+        .filter(
+            User.username.ilike(f"%{query}%"),
+            User.id != current_user.id,
+        )
+        .limit(10)
         .all()
     )

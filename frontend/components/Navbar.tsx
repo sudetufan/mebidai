@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-
+import UserSearch from "@/components/UserSearch";
 import {
   LayoutDashboard,
   FilePlus2,
@@ -55,7 +55,7 @@ export default function Navbar() {
 
 
         <div className="hidden md:flex items-center gap-6">
-
+          <UserSearch />
           <Link href="/" className={linkClass("/")}>
             Home
           </Link>

@@ -40,6 +40,11 @@ class UserProfile(BaseModel):
     comment_count: int
     like_count: int
 
+    followers_count: int
+    following_count: int
+
+    is_following: bool
+
     class Config:
         from_attributes = True
 

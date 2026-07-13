@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response, HTTPException
+from fastapi import APIRouter, Depends, Response, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.models.user import User
 from app.api.dependencies import (
@@ -21,10 +21,12 @@ from app.services.user_service import (
     login_user,
     google_login_user,
     get_profile,
+    get_user_profile,
     follow_user,
     unfollow_user,
     get_followers,
     get_following,
+    search_users,
 )
 
 from app.services.google_service import (
@@ -146,6 +148,46 @@ def profile_posts(
         current_user.id,
     )
 
+@router.get(
+    "/{user_id}/posts",
+    response_model=list[PostResponse],
+)
+def user_posts(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    return get_user_posts(
+        db,
+        user_id,
+    )
+
+@router.get("/search", response_model=list[UserMini])
+def search(
+    q: str = Query(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return search_users(
+        db,
+        q,
+        current_user,
+    )
+
+@router.get(
+    "/{user_id}",
+    response_model=UserProfile,
+)
+def user_profile(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_user_profile(
+        db,
+        current_user,
+        user_id,
+    )
+
 @router.post("/logout")
 def logout(response: Response):
 
@@ -165,6 +207,7 @@ def admin_test(
     return {
         "message": f"Welcome Admin {admin.username}"
     }
+
 
 @router.post("/{user_id}/follow")
 def follow(
