@@ -320,3 +320,27 @@ export async function unfollowUser(userId: string) {
 
   return response.json();
 }
+
+export async function getFollowers(userId: string) {
+  const response = await fetch(
+    `${API_URL}/users/${userId}/followers`,
+    {
+      cache: "no-store",
+      credentials: "include",
+    }
+  );
+
+  return handleResponse(response);
+}
+
+export async function getFollowing(userId: string) {
+  const response = await fetch(
+    `${API_URL}/users/${userId}/following`,
+    {
+      cache: "no-store",
+      credentials: "include",
+    }
+  );
+
+  return handleResponse(response);
+}

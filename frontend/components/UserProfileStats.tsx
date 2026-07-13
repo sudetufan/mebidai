@@ -12,6 +12,7 @@ import FollowListModal from "./FollowListModal";
 
 type Props = {
   profile: {
+    id: number;
     post_count: number;
     comment_count: number;
     like_count: number;
@@ -78,6 +79,7 @@ export default function UserProfileStats({ profile }: Props) {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         title={title}
+        userId={String(profile.id)}
       />
     </>
   );
