@@ -14,7 +14,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-
+import NotificationDropdown from "@/components/NotificationDropdown";
 
 export default function Navbar() {
   const router = useRouter();
@@ -68,7 +68,8 @@ export default function Navbar() {
 
           {user ? (
             <>
-
+              <NotificationDropdown />
+              
               <Link
                 href="/dashboard"
                 className={`flex items-center gap-1 ${linkClass("/dashboard")}`}

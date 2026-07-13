@@ -344,3 +344,28 @@ export async function getFollowing(userId: string) {
 
   return handleResponse(response);
 }
+export async function getNotifications() {
+  const response = await fetch(
+    `${API_URL}/notifications/`,
+    {
+      cache: "no-store",
+      credentials: "include",
+    }
+  );
+
+  return handleResponse(response);
+}
+
+export async function markNotificationAsRead(
+  notificationId: number
+) {
+  const response = await fetch(
+    `${API_URL}/notifications/${notificationId}/read`,
+    {
+      method: "PATCH",
+      credentials: "include",
+    }
+  );
+
+  return handleResponse(response);
+}

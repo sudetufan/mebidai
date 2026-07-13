@@ -13,6 +13,7 @@ from app.security import (
 )
 from sqlalchemy import func
 from app.schemas.user import UserCreate
+from app.services.notification_service import create_notification
 
 
 def create_user(
@@ -261,7 +262,12 @@ def follow_user(
 
     db.add(follow)
     db.commit()
-
+    create_notification(
+        db=db,
+        recipient_id=target_user.id,
+        sender_id=current_user.id,
+        notification_type="follow",
+    )
     return {
         "message": "User followed successfully"
     }

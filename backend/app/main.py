@@ -7,6 +7,7 @@ from app.api.v1.routes import (
     comments,
     admin,
     categories,
+    notifications,
 )
 
 from app.db.base import Base
@@ -20,6 +21,7 @@ from app.models import (
     like,
     category,
     follow,
+    notification,
 )
 
 
@@ -59,3 +61,4 @@ def root():
         "status": "running",
         "docs": "/docs",
     }
+app.include_router(notifications.router, prefix="/api/v1")
