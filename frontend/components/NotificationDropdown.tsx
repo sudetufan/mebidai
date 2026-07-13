@@ -17,8 +17,8 @@ type Notification = {
   is_read: boolean;
   created_at: string;
 };
-export default function NotificationDropdown() {
 
+export default function NotificationDropdown() {
   const router = useRouter();
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -36,16 +36,13 @@ export default function NotificationDropdown() {
   useEffect(() => {
     loadNotifications();
   }, []);
+
   async function handleNotificationClick(
     notification: Notification
   ) {
     try {
-
       if (!notification.is_read) {
-
-        await markNotificationAsRead(
-          notification.id
-        );
+        await markNotificationAsRead(notification.id);
 
         setNotifications((prev) =>
           prev.map((item) =>
@@ -58,15 +55,33 @@ export default function NotificationDropdown() {
           )
         );
       }
-      router.push(
-        `/profile/${notification.sender_id}`
-      );
 
+      setOpen(false);
 
+      router.push(`/profile/${notification.sender_id}`);
     } catch (error) {
       console.error(error);
     }
   }
+
+  function getNotificationMessage(type: string) {
+    switch (type) {
+        case "follow":
+            return "started following you";
+
+        case "like":
+            return "liked your post";
+
+        case "comment":
+            return "commented on your post";
+        case "mention":
+            return "mentioned you in a comment";
+
+        default:
+            return "sent you a notification";
+        }
+    }
+
   const unreadCount = notifications.filter(
     (notification) => !notification.is_read
   ).length;
@@ -77,21 +92,21 @@ export default function NotificationDropdown() {
         onClick={() => setOpen(!open)}
         className="relative hover:text-blue-400"
       >
-        <Bell size={20}/>
-        {unreadCount > 0 && (
+        <Bell size={20} />
 
+        {unreadCount > 0 && (
           <span
             className="
-              absolute 
-              -right-2 
-              -top-2 
-              flex 
-              h-4 
-              w-4 
-              items-center 
-              justify-center 
-              rounded-full 
-              bg-red-500 
+              absolute
+              -right-2
+              -top-2
+              flex
+              h-4
+              w-4
+              items-center
+              justify-center
+              rounded-full
+              bg-red-500
               text-xs
             "
           >
@@ -99,34 +114,32 @@ export default function NotificationDropdown() {
           </span>
         )}
       </button>
-      {open && (
 
+      {open && (
         <div
           className="
-            absolute 
-            right-0 
-            mt-3 
-            w-72 
-            rounded-lg 
-            border 
-            border-slate-700 
-            bg-slate-900 
-            p-3 
+            absolute
+            right-0
+            mt-3
+            w-72
+            rounded-lg
+            border
+            border-slate-700
+            bg-slate-900
+            p-3
             shadow-lg
           "
         >
           <h3 className="mb-2 font-semibold">
             Notifications
           </h3>
-          {notifications.length === 0 ? (
 
+          {notifications.length === 0 ? (
             <p className="text-sm text-gray-400">
               No notifications
             </p>
           ) : (
-
             notifications.map((notification) => (
-
               <div
                 key={notification.id}
                 onClick={() =>
@@ -147,13 +160,12 @@ export default function NotificationDropdown() {
                 `}
               >
                 <p>
-
                   <span className="font-semibold">
                     {notification.sender_username}
-                  </span>
-
-                  {" "}started following you
+                  </span>{" "}
+                  {getNotificationMessage(notification.type)}
                 </p>
+
                 <p className="text-xs text-gray-400">
                   {new Date(
                     notification.created_at
