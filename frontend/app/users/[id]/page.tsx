@@ -59,7 +59,7 @@ export default async function UserProfilePage({
               </div>
             </div>
 
-            {currentUser && !isOwnProfile && (
+            {!isOwnProfile && (
               <FollowButton
                 userId={id}
                 initialFollowing={profile.is_following}

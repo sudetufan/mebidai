@@ -311,13 +311,8 @@ export async function followUser(userId: string) {
     }
   );
 
-  if (!response.ok) {
-    throw new Error("Follow failed");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
-
 
 export async function unfollowUser(userId: string) {
   const response = await fetch(
@@ -328,11 +323,7 @@ export async function unfollowUser(userId: string) {
     }
   );
 
-  if (!response.ok) {
-    throw new Error("Unfollow failed");
-  }
-
-  return response.json();
+  return handleResponse(response);
 }
 
 export async function getFollowers(userId: string) {
