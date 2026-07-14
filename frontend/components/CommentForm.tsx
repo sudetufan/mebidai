@@ -1,13 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+import { searchUsers } from "@/lib/api";
 
 type Props = {
   postId: number;
 };
 
+type User = {
+  id: number;
+  username: string;
+};
+
 export default function CommentForm({ postId }: Props) {
   const [content, setContent] = useState("");
+  const [suggestions, setSuggestions] = useState<User[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  useEffect(() => {
+    async function findUsers() {
+      const match = content.match(/@([a-zA-Z0-9_]+)$/);
+
+      if (!match) {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        return;
+      }
+
+      const query = match[1];
+
+      if (query.length === 0) {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        return;
+      }
+
+      try {
+        const users = await searchUsers(query);
+
+        setSuggestions(users.slice(0, 5));
+        setShowSuggestions(true);
+
+      } catch {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }
+
+    findUsers();
+
+  }, [content]);
+
+
+  function selectUser(user: User) {
+    const newText = content.replace(
+      /@([a-zA-Z0-9_]+)$/,
+      `@${user.username} `
+    );
+
+    setContent(newText);
+    setSuggestions([]);
+    setShowSuggestions(false);
+  }
+
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -35,14 +91,39 @@ export default function CommentForm({ postId }: Props) {
     }
   }
 
+
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-      <textarea
-        className="w-full border rounded-lg p-3"
-        placeholder="Yorum yaz..."
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
+
+      <div className="relative">
+
+        <textarea
+          className="w-full border rounded-lg p-3"
+          placeholder="Yorum yaz..."
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
+
+
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute left-0 bottom-full mb-2 w-full bg-white border rounded-lg shadow-lg overflow-hidden">
+
+            {suggestions.map((user) => (
+              <button
+                type="button"
+                key={user.id}
+                onClick={() => selectUser(user)}
+                className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+              >
+                @{user.username}
+              </button>
+            ))}
+
+          </div>
+        )}
+
+      </div>
+
 
       <button
         type="submit"
@@ -50,6 +131,7 @@ export default function CommentForm({ postId }: Props) {
       >
         Yorum Yap
       </button>
+
     </form>
   );
 }

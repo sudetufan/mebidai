@@ -51,6 +51,7 @@ def like_post(db: Session, post_id: int, current_user: User):
             recipient_id=post.user_id,
             sender_id=current_user.id,
             notification_type="like",
+            post_id=post.id,
         )
 
 

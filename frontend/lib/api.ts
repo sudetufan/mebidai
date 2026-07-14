@@ -148,6 +148,7 @@ export async function getComments(postId: string) {
 export async function createComment(comment: {
   content: string;
   post_id: number;
+  parent_id?: number;
 }) {
   const response = await fetch(`${API_URL}/comments/`, {
     method: "POST",
@@ -244,6 +245,19 @@ export async function updateComment(
       body: JSON.stringify({
         content,
       }),
+    }
+  );
+
+  return handleResponse(response);
+}
+export async function deleteComment(
+  id: number
+) {
+  const response = await fetch(
+    `${API_URL}/comments/${id}`,
+    {
+      method: "DELETE",
+      credentials: "include",
     }
   );
 
@@ -364,6 +378,18 @@ export async function markNotificationAsRead(
     {
       method: "PATCH",
       credentials: "include",
+    }
+  );
+
+  return handleResponse(response);
+}
+
+export async function searchUsers(query: string) {
+  const response = await fetch(
+    `${API_URL}/users/search?q=${encodeURIComponent(query)}`,
+    {
+      credentials: "include",
+      cache: "no-store",
     }
   );
 

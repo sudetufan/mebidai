@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { serverFetch } from "@/lib/server-api";
-import FollowButton from "@/components/FollowButton";
 import UserProfileStats from "@/components/UserProfileStats";
-
 import {
   Mail,
   Shield,
@@ -10,61 +8,38 @@ import {
   User,
 } from "lucide-react";
 
-type Props = {
-  params: Promise<{
-    id: string;
-  }>;
-};
-
 export default async function UserProfilePage({
   params,
-}: Props) {
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
 
   const profile = await serverFetch(`/users/${id}`);
   const posts = await serverFetch(`/users/${id}/posts`);
-  let currentUser = null;
-
-  try {
-    currentUser = await serverFetch("/users/me");
-  } catch {}
-
-    const isOwnProfile =
-        currentUser !== null &&
-        currentUser.id === profile.id;
-
 
   return (
     <main className="max-w-5xl mx-auto px-6 py-12 space-y-10">
       <section className="overflow-hidden rounded-3xl bg-white shadow-sm border">
         <div className="bg-slate-900 px-8 py-10 text-white">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white/20 text-4xl font-bold">
-                {profile.username.charAt(0).toUpperCase()}
-              </div>
-
-              <div>
-                <h1 className="text-4xl font-bold">
-                  {profile.username}
-                </h1>
-
-                <p className="mt-2 text-slate-300">
-                  Developer Community Member
-                </p>
-
-                <span className="mt-4 inline-block rounded-full bg-white/20 px-4 py-1 text-sm capitalize">
-                  {profile.role}
-                </span>
-              </div>
+          <div className="flex items-center gap-6">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white/20 text-4xl font-bold">
+              {profile.username.charAt(0).toUpperCase()}
             </div>
 
-            {currentUser && !isOwnProfile && (
-              <FollowButton
-                userId={id}
-                initialFollowing={profile.is_following}
-              />
-            )}
+            <div>
+              <h1 className="text-4xl font-bold">
+                {profile.username}
+              </h1>
+
+              <p className="mt-2 text-slate-300">
+                Developer Community Member
+              </p>
+
+              <span className="mt-4 inline-block rounded-full bg-white/20 px-4 py-1 text-sm capitalize">
+                {profile.role}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -105,7 +80,7 @@ export default async function UserProfilePage({
 
       <section>
         <h2 className="mb-6 text-2xl font-bold">
-          Posts
+          {profile.username}'s Posts
         </h2>
 
         {posts.length === 0 ? (
@@ -115,6 +90,10 @@ export default async function UserProfilePage({
             <h3 className="text-xl font-semibold">
               No posts yet
             </h3>
+
+            <p className="mt-2 text-gray-500">
+              This user hasn't shared anything yet.
+            </p>
           </div>
         ) : (
           <div className="space-y-5">
@@ -134,7 +113,6 @@ export default async function UserProfilePage({
 
                 <div className="mt-5 flex items-center gap-2 text-sm text-gray-500">
                   <Heart size={16} />
-
                   {post.like_count} Likes
                 </div>
               </Link>

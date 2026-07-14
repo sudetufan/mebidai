@@ -382,15 +382,18 @@ def get_user_profile(
         .count()
     )
 
-    is_following = (
-        db.query(Follow)
-        .filter(
-            Follow.follower_id == current_user.id,
-            Follow.following_id == user.id,
+    if current_user:
+        is_following = (
+            db.query(Follow)
+            .filter(
+                Follow.follower_id == current_user.id,
+                Follow.following_id == user.id,
+            )
+            .first()
+            is not None
         )
-        .first()
-        is not None
-    )
+    else:
+        is_following = False
 
     return {
         "id": user.id,
@@ -408,14 +411,33 @@ def get_user_profile(
 def search_users(
     db: Session,
     query: str,
-    current_user: User,
 ):
     return (
         db.query(User)
         .filter(
-            User.username.ilike(f"%{query}%"),
-            User.id != current_user.id,
+            User.username.ilike(f"%{query}%")
         )
         .limit(10)
         .all()
     )
+
+def get_user_by_username(
+    db: Session,
+    username: str,
+):
+    user = (
+        db.query(User)
+        .filter(User.username == username)
+        .first()
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+
+    return {
+        "id": user.id,
+        "username": user.username,
+    }

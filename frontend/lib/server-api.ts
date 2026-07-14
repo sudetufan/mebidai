@@ -22,7 +22,9 @@ export async function serverFetch(path: string) {
   });
 
   if (!response.ok) {
-    throw new Error("Request failed");
+    console.log("FAILED:", path, response.status);
+
+    throw new Error(`Request failed: ${path} (${response.status})`);
   }
 
   return response.json();

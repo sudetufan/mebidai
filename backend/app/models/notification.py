@@ -28,6 +28,16 @@ class Notification(Base):
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )
+    post_id = Column(
+        Integer,
+        ForeignKey("posts.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+    comment_id = Column(
+        Integer,
+        ForeignKey("comments.id", ondelete="CASCADE"),
+        nullable=True,
+    )
 
     type = Column(String, nullable=False)
 
@@ -47,4 +57,10 @@ class Notification(Base):
     sender = relationship(
         "User",
         foreign_keys=[sender_id],
+    )
+    post = relationship(
+        "Post",
+    )
+    comment = relationship(
+        "Comment",
     )

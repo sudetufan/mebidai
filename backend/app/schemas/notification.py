@@ -6,6 +6,7 @@ class NotificationResponse(BaseModel):
     type: str
     sender_id: int
     sender_username: str
+    post_id: int | None
     is_read: bool
     created_at: datetime
 

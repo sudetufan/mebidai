@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { followUser, unfollowUser } from "@/lib/api";
+import { useRouter } from "next/navigation";
+
+import {
+  followUser,
+  unfollowUser,
+  ApiError,
+} from "@/lib/api";
 
 export default function FollowButton({
   userId,
@@ -10,10 +16,10 @@ export default function FollowButton({
   userId: string;
   initialFollowing: boolean;
 }) {
+  const router = useRouter();
 
   const [following, setFollowing] = useState(initialFollowing);
   const [loading, setLoading] = useState(false);
-
 
   async function handleFollow() {
     try {
@@ -26,12 +32,17 @@ export default function FollowButton({
         await followUser(userId);
         setFollowing(true);
       }
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        router.push("/login");
+        return;
+      }
 
+      alert("Something went wrong.");
     } finally {
       setLoading(false);
     }
   }
-
 
   return (
     <button
