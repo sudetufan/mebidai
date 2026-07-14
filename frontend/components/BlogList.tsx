@@ -19,6 +19,7 @@ type Post = {
   content: string;
   like_count: number;
   liked: boolean;
+  user_id: number;
   user: {
     id: number;
     username: string;
@@ -224,6 +225,7 @@ export default function BlogList({
             id={post.id}
             title={post.title}
             author={post.user.username}
+            authorId={post.user_id}
             content={post.content}
             likeCount={post.like_count}
             liked={post.liked}

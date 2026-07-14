@@ -10,13 +10,23 @@ import UserManager from "@/components/admin/UserManager";
 import PostManager from "@/components/admin/PostManager";
 import CommentManager from "@/components/admin/CommentManager";
 
+import {
+  User,
+  Category,
+  AdminPost,
+  Comment,
+} from "@/types";
+
+
 const API_URL = "http://localhost:8000/api/v1";
 
+
 export default function AdminPage() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [posts, setPosts] = useState<any[]>([]);
-  const [comments, setComments] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+
+  const [users, setUsers] = useState<User[]>([]);
+  const [posts, setPosts] = useState<AdminPost[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -25,23 +35,29 @@ export default function AdminPage() {
   }, []);
 
   async function loadData() {
+
     try {
+
       const [
         usersRes,
         postsRes,
         commentsRes,
+        categoryData,
       ] = await Promise.all([
+
         fetch(`${API_URL}/admin/users`, {
           credentials: "include",
         }),
+
         fetch(`${API_URL}/admin/posts`, {
           credentials: "include",
         }),
+
         fetch(`${API_URL}/admin/comments`, {
           credentials: "include",
         }),
+        getCategories(),
       ]);
-
       if (
         usersRes.status === 401 ||
         usersRes.status === 403
@@ -49,21 +65,38 @@ export default function AdminPage() {
         alert("Bu sayfaya erişim yetkiniz yok.");
         window.location.href = "/login";
         return;
+
       }
+      if (
+        !usersRes.ok ||
+        !postsRes.ok ||
+        !commentsRes.ok
+      ) {
+        throw new Error(
+          "Admin data loading failed"
+        );
+      }
+      const usersData: User[] =
+        await usersRes.json();
+      const postsData: AdminPost[] =
+        await postsRes.json();
+      const commentsData: Comment[] =
+        await commentsRes.json();
 
-      setUsers(await usersRes.json());
-      setPosts(await postsRes.json());
-      setComments(await commentsRes.json());
-
-      const categoryData = await getCategories();
+      setUsers(usersData);
+      setPosts(postsData);
+      setComments(commentsData);
       setCategories(categoryData);
-    } catch (error) {
-      console.error("Admin data loading error:", error);
+    } catch(error) {
+
+      console.error(
+        "Admin loading error:",
+        error
+      );
     } finally {
       setLoading(false);
     }
   }
-
   if (loading) {
     return (
       <main className="max-w-6xl mx-auto py-10 px-6">
@@ -73,7 +106,6 @@ export default function AdminPage() {
       </main>
     );
   }
-
   return (
     <main className="max-w-6xl mx-auto py-10 px-6">
       <h1 className="mb-8 text-4xl font-bold">
@@ -86,26 +118,24 @@ export default function AdminPage() {
         comments={comments.length}
         categories={categories.length}
       />
-
       <CategoryManager
         categories={categories}
         onRefresh={loadData}
       />
-
       <UserManager
         users={users}
         onRefresh={loadData}
       />
-
       <PostManager
         posts={posts}
         onRefresh={loadData}
       />
-
       <CommentManager
         comments={comments}
         onRefresh={loadData}
       />
     </main>
+
   );
+
 }

@@ -11,8 +11,9 @@ import {
 } from "@/lib/api";
 
 import MentionText from "@/components/MentionText";
+import { Comment } from "@/types";
 type Props = {
-  comments: any[];
+  comments: Comment[];
 };
 export default function CommentList({ comments }: Props) {
 
@@ -49,7 +50,7 @@ export default function CommentList({ comments }: Props) {
     }
   }
   async function handleReply(
-    comment: any
+    comment: Comment
   ) {
     if (!replyContent.trim()) {
       return;
@@ -72,7 +73,7 @@ export default function CommentList({ comments }: Props) {
     }
   }
   function renderComment(
-    comment: any,
+    comment: Comment,
     level = 0
   ) {
 
@@ -189,7 +190,7 @@ export default function CommentList({ comments }: Props) {
         {
           comment.replies &&
           comment.replies.length > 0 &&
-          comment.replies.map((reply:any)=>
+          comment.replies.map((reply:Comment)=>
             renderComment(
               reply,
               level + 1
@@ -207,7 +208,7 @@ export default function CommentList({ comments }: Props) {
           No comments yet.
         </p>
       ) : (
-        comments.map((comment:any)=>
+        comments.map((comment)=>
           renderComment(comment)
         )
       )}
