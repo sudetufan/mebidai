@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
@@ -25,6 +25,9 @@ class User(Base):
 
     role = Column(String, default="user")
 
+    # E-posta doğrulandı mı?
+    is_verified = Column(Boolean, default=False, nullable=False)
+
     posts = relationship(
         "Post",
         back_populates="user",
@@ -42,6 +45,7 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+
     followers = relationship(
         "Follow",
         foreign_keys="Follow.following_id",
@@ -54,10 +58,11 @@ class User(Base):
         foreign_keys="Follow.follower_id",
         back_populates="follower",
         cascade="all, delete-orphan",
-)
+    )
+
     notifications = relationship(
         "Notification",
         foreign_keys="Notification.recipient_id",
         back_populates="recipient",
         cascade="all, delete-orphan",
-)
+    )

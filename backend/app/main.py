@@ -22,6 +22,7 @@ from app.models import (
     category,
     follow,
     notification,
+    email_verification,
 )
 
 

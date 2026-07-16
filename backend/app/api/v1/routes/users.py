@@ -9,7 +9,9 @@ from app.api.dependencies import (
     get_current_user,
     get_optional_user,
 )
-
+from app.services.verification_service import (
+    verify_email_token,
+)
 from app.schemas.user import (
     UserCreate,
     UserLogin,
@@ -162,6 +164,16 @@ def profile_posts(
     return get_user_posts(
         db,
         current_user.id,
+    )
+
+@router.get("/verify-email")
+def verify_email(
+    token: str,
+    db: Session = Depends(get_db),
+):
+    return verify_email_token(
+        db=db,
+        token=token,
     )
 
 @router.get(

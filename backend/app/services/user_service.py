@@ -1,6 +1,5 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from app.schemas.user import UserCreate
 from app.models.post import Post
 from app.models.comment import Comment
 from app.models.like import Like
@@ -11,7 +10,7 @@ from app.security import (
     verify_password,
     create_access_token,
 )
-from sqlalchemy import func
+from app.services.verification_service import create_verification_token
 from app.schemas.user import UserCreate
 from app.services.notification_service import create_notification
 
@@ -55,6 +54,11 @@ def create_user(
     db.commit()
     db.refresh(new_user)
 
+    create_verification_token(
+        db=db,
+        user_id=new_user.id,
+    )
+
     return new_user
 
 
@@ -84,10 +88,16 @@ def login_user(
             status_code=401,
             detail="Invalid email or password",
         )
+
+    if not user.is_verified:
+        raise HTTPException(
+            status_code=403,
+            detail="Please verify your email before logging in.",
+        )
+
     return create_access_token(
         data={"sub": user.email}
     )
-
 def google_login_user(
     db: Session,
     google_data: dict,
@@ -120,6 +130,7 @@ def google_login_user(
             google_id=google_id,
             provider="google",
             hashed_password=None,
+            is_verified=True,
         )
 
         db.add(user)
