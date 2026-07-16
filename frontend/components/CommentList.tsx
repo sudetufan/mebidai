@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import {
   updateComment,
@@ -18,6 +19,7 @@ type Props = {
 export default function CommentList({ comments }: Props) {
 
   const { user } = useAuth();
+  const router = useRouter();
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [content, setContent] = useState("");
@@ -28,7 +30,7 @@ export default function CommentList({ comments }: Props) {
   async function handleSave() {
 
     if (!editingId || !content.trim()) {
-      alert("Comment cannot be empty.");
+      toast.error("Comment cannot be empty.");
       return;
     }
     try {
@@ -43,9 +45,9 @@ export default function CommentList({ comments }: Props) {
     } catch (error) {
 
       if (error instanceof ApiError) {
-        alert(error.message);
+        toast.error(error.message);
       } else {
-        alert("Comment could not be updated.");
+        toast.error("Comment could not be updated.");
       }
     }
   }
@@ -68,8 +70,26 @@ export default function CommentList({ comments }: Props) {
 
       window.location.reload();
 
-    } catch(error) {
-      alert("Reply could not be added.");
+    } catch (error) {
+
+        if (
+            error instanceof ApiError &&
+            error.status === 401
+        ) {
+            toast.error("Please log in to reply.");
+
+            setTimeout(() => {
+                router.push("/login");
+            }, 1500);
+
+            return;
+        }
+
+        if (error instanceof ApiError) {
+            toast.error(error.message);
+        } else {
+            toast.error("Reply could not be added.");
+        }
     }
   }
   function renderComment(
@@ -236,9 +256,9 @@ async function handleDelete(
   } catch (error) {
 
     if (error instanceof ApiError) {
-      alert(error.message);
+      toast.error(error.message);
     } else {
-      alert(
+      toast.error(
         "Comment could not be deleted."
       );
     }

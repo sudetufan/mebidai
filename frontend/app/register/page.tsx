@@ -7,6 +7,7 @@ import {
   Mail,
   Lock,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { registerUser, ApiError } from "@/lib/api";
 
@@ -21,7 +22,7 @@ export default function RegisterPage() {
     e.preventDefault();
 
     if (!username || !email || !password) {
-      alert("Please fill all fields");
+      toast.error("Please fill in all fields.");
       return;
     }
 
@@ -32,14 +33,26 @@ export default function RegisterPage() {
         password,
       });
 
-      alert("Account created successfully!");
+      toast.success("Account created successfully!");
+
       router.push("/login");
 
     } catch (error) {
       if (error instanceof ApiError) {
-        alert(error.message);
+        switch (error.message) {
+          case "Email already registered":
+            toast.error("This email address is already in use.");
+            break;
+
+          case "Username already taken":
+            toast.error("This username is already taken.");
+            break;
+
+          default:
+            toast.error(error.message);
+        }
       } else {
-        alert("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
       }
     }
   }

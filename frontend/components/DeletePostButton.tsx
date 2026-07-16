@@ -1,6 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+import ConfirmModal from "@/components/ConfirmModal";
 
 const API_URL = "http://localhost:8000/api/v1";
 
@@ -11,37 +15,77 @@ export default function DeletePostButton({
 }) {
   const router = useRouter();
 
+  const [open, setOpen] = useState(false);
+
   async function handleDelete() {
-    const confirmed = confirm(
-      "Bu postu silmek istediğinize emin misiniz?"
-    );
+    try {
+      const response = await fetch(
+        `${API_URL}/posts/${postId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
 
-    if (!confirmed) return;
+      if (response.ok) {
+        toast.success("Post deleted successfully.");
 
+        setOpen(false);
 
-    const response = await fetch(
-      `${API_URL}/posts/${postId}`,
-      {
-        method: "DELETE",
-        credentials: "include",
+        router.refresh();
+
+        return;
       }
-    );
 
+      if (response.status === 401) {
+        toast.error("Please log in first.");
 
-    if (response.ok) {
-      router.refresh();
-    } else {
-      alert("Post silinemedi.");
+        setOpen(false);
+
+        setTimeout(() => {
+          router.push("/login");
+        }, 1500);
+
+        return;
+      }
+
+      if (response.status === 403) {
+        toast.error(
+          "You are not allowed to delete this post."
+        );
+
+        setOpen(false);
+
+        return;
+      }
+
+      toast.error("Post could not be deleted.");
+
+      setOpen(false);
+
+    } catch {
+      toast.error("Something went wrong.");
+
+      setOpen(false);
     }
   }
 
-
   return (
-    <button
-      onClick={handleDelete}
-      className="text-red-600 hover:text-red-800"
-    >
-      Delete
-    </button>
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="text-red-600 hover:text-red-800"
+      >
+        Delete
+      </button>
+
+      <ConfirmModal
+        open={open}
+        title="Delete Post"
+        description="Are you sure you want to delete this post?"
+        onCancel={() => setOpen(false)}
+        onConfirm={handleDelete}
+      />
+    </>
   );
 }

@@ -5,7 +5,7 @@ import {
   FileText,
   MessageSquare,
   Heart,
-  User,
+  Users,
 } from "lucide-react";
 
 import FollowListModal from "./FollowListModal";
@@ -25,53 +25,85 @@ export default function UserProfileStats({ profile }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState<"Followers" | "Following">("Followers");
 
-  const openFollowers = () => {
-    setTitle("Followers");
-    setIsOpen(true);
-  };
-
-  const openFollowing = () => {
-    setTitle("Following");
-    setIsOpen(true);
-  };
-
   return (
     <>
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
         <div className="rounded-2xl border p-5 text-center">
-          <FileText className="mx-auto mb-3 text-blue-600" />
+          <FileText className="mx-auto mb-3 text-blue-600" size={28} />
+
           <p className="text-3xl font-bold">{profile.post_count}</p>
-          <p className="text-sm text-gray-500">Posts</p>
+
+          <p className="mt-2 text-sm text-gray-500">
+            Posts
+          </p>
         </div>
 
         <div className="rounded-2xl border p-5 text-center">
-          <MessageSquare className="mx-auto mb-3 text-green-600" />
+          <MessageSquare
+            className="mx-auto mb-3 text-green-600"
+            size={28}
+          />
+
           <p className="text-3xl font-bold">{profile.comment_count}</p>
-          <p className="text-sm text-gray-500">Comments</p>
+
+          <p className="mt-2 text-sm text-gray-500">
+            Comments
+          </p>
         </div>
 
         <div className="rounded-2xl border p-5 text-center">
-          <Heart className="mx-auto mb-3 text-red-500" />
+          <Heart
+            className="mx-auto mb-3 text-red-500"
+            size={28}
+          />
+
           <p className="text-3xl font-bold">{profile.like_count}</p>
-          <p className="text-sm text-gray-500">Likes</p>
+
+          <p className="mt-2 text-sm text-gray-500">
+            Likes
+          </p>
         </div>
 
         <button
-          onClick={openFollowers}
-          className="rounded-2xl border p-5 text-center hover:bg-gray-50 transition"
+          onClick={() => {
+            setTitle("Followers");
+            setIsOpen(true);
+          }}
+          className="rounded-2xl border p-5 text-center transition hover:bg-gray-50"
         >
-          <User className="mx-auto mb-3 text-indigo-600" />
-          <p className="text-3xl font-bold">{profile.followers_count}</p>
-          <p className="text-sm text-gray-500">Followers</p>
+          <Users
+            className="mx-auto mb-3 text-indigo-600"
+            size={28}
+          />
+
+          <p className="text-3xl font-bold">
+            {profile.followers_count}
+          </p>
+
+          <p className="mt-2 text-sm text-gray-500">
+            Followers
+          </p>
         </button>
 
         <button
-          onClick={openFollowing}
-          className="rounded-2xl border p-5 text-center hover:bg-gray-50 transition"
+          onClick={() => {
+            setTitle("Following");
+            setIsOpen(true);
+          }}
+          className="rounded-2xl border p-5 text-center transition hover:bg-gray-50"
         >
-          <User className="mx-auto mb-3 text-orange-600" />
-          <p className="text-3xl font-bold">{profile.following_count}</p>
-          <p className="text-sm text-gray-500">Following</p>
+          <Users
+            className="mx-auto mb-3 text-orange-600"
+            size={28}
+          />
+
+          <p className="text-3xl font-bold">
+            {profile.following_count}
+          </p>
+
+          <p className="mt-2 text-sm text-gray-500">
+            Following
+          </p>
         </button>
       </div>
 

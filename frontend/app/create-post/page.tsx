@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { toast } from "sonner";
 import {
   createPost,
   getCategories,
@@ -40,9 +40,9 @@ export default function CreatePostPage() {
 
       } catch (error) {
         if (error instanceof ApiError) {
-          alert(error.message);
+          toast.error(error.message);
         } else {
-          alert("Failed to load categories.");
+          toast.error("Failed to load categories.");
         }
       }
     }
@@ -54,12 +54,12 @@ export default function CreatePostPage() {
     e.preventDefault();
 
     if (!title || !content) {
-      alert("Please fill all fields");
+      toast.error("Please fill in all fields.");
       return;
     }
 
     if (!categoryId) {
-      alert("Please select a category");
+      toast.error("Please select a category.");
       return;
     }
 
@@ -70,15 +70,30 @@ export default function CreatePostPage() {
         category_id: categoryId,
       });
 
-      alert("Post created successfully!");
+      toast.success("Post created successfully!");
 
-      router.push("/blog");
+      setTimeout(() => {
+        router.push("/blog");
+      }, 1000);
 
     } catch (error) {
       if (error instanceof ApiError) {
-        alert(error.message);
+        if (
+          error instanceof ApiError &&
+          error.status === 401
+        ) {
+          toast.error("Please log in to create a post.");
+
+          setTimeout(() => {
+            router.push("/login");
+          }, 1500);
+
+          return;
+        }
+
+        toast.error(error.message);
       } else {
-        alert("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
       }
     }
   }

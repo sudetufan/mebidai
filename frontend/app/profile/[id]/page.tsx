@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { serverFetch } from "@/lib/server-api";
 import UserProfileStats from "@/components/UserProfileStats";
+import FollowButton from "@/components/FollowButton";
+
 import {
   Mail,
   Shield,
@@ -18,9 +20,17 @@ export default async function UserProfilePage({
   const profile = await serverFetch(`/users/${id}`);
   const posts = await serverFetch(`/users/${id}/posts`);
 
+  let currentUser = null;
+
+  try {
+    currentUser = await serverFetch("/users/me");
+  } catch {
+    currentUser = null;
+  }
+
   return (
     <main className="max-w-5xl mx-auto px-6 py-12 space-y-10">
-      <section className="overflow-hidden rounded-3xl bg-white shadow-sm border">
+      <section className="overflow-hidden rounded-3xl border bg-white shadow-sm">
         <div className="bg-slate-900 px-8 py-10 text-white">
           <div className="flex items-center gap-6">
             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white/20 text-4xl font-bold">
@@ -39,13 +49,25 @@ export default async function UserProfilePage({
               <span className="mt-4 inline-block rounded-full bg-white/20 px-4 py-1 text-sm capitalize">
                 {profile.role}
               </span>
+
+              {currentUser &&
+                currentUser.id !== profile.id && (
+                  <div className="mt-5">
+                    <FollowButton
+                      userId={String(profile.id)}
+                      initialFollowing={
+                        profile.is_following ?? false
+                      }
+                    />
+                  </div>
+                )}
             </div>
           </div>
         </div>
 
-        <div className="grid gap-8 p-8 md:grid-cols-2">
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
+        <div className="p-8 space-y-8">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="flex items-center gap-4 rounded-2xl border p-5">
               <Mail className="text-slate-500" />
 
               <div>
@@ -59,7 +81,7 @@ export default async function UserProfilePage({
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 rounded-2xl border p-5">
               <Shield className="text-slate-500" />
 
               <div>

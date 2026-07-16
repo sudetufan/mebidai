@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import ConfirmModal from "@/components/ConfirmModal";
-
+import { toast } from "sonner";
 import { AdminPost } from "@/types";
 
 
@@ -54,7 +54,7 @@ export default function PostManager({
 
     }else{
 
-      alert(
+      toast.error(
         "Post could not be deleted."
       );
 

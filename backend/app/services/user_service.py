@@ -21,16 +21,28 @@ def create_user(
     user: UserCreate,
 ) -> User:
 
-    existing_user = (
+    existing_email = (
         db.query(User)
         .filter(User.email == user.email)
         .first()
     )
 
-    if existing_user:
+    if existing_email:
         raise HTTPException(
             status_code=409,
             detail="Email already registered",
+        )
+
+    existing_username = (
+        db.query(User)
+        .filter(User.username == user.username)
+        .first()
+    )
+
+    if existing_username:
+        raise HTTPException(
+            status_code=409,
+            detail="Username already taken",
         )
 
     new_user = User(
@@ -44,7 +56,6 @@ def create_user(
     db.refresh(new_user)
 
     return new_user
-
 
 
 def login_user(

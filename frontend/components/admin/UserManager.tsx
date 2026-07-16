@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import ConfirmModal from "@/components/ConfirmModal";
-
+import { toast } from "sonner";
 import { User } from "@/types";
 
 
@@ -55,7 +55,7 @@ export default function UserManager({
 
     } else {
 
-      alert(
+        toast.error(
         "User could not be deleted."
       );
 

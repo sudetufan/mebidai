@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
+import { toast } from "sonner";
 import {
   searchUsers,
   createComment,
@@ -72,7 +72,7 @@ export default function CommentForm({ postId }: Props) {
     e.preventDefault();
 
     if (!content.trim()) {
-      alert("Comment cannot be empty.");
+      toast.error("Comment cannot be empty.");
       return;
     }
 
@@ -81,24 +81,31 @@ export default function CommentForm({ postId }: Props) {
         content,
         post_id: postId,
       });
-
+      
+      toast.success("Comment added successfully.");
       setContent("");
-      window.location.reload();
+      setTimeout(() => {
+        window.location.reload();
+      }, 600);
     } catch (error) {
       if (
         error instanceof ApiError &&
         error.status === 401
       ) {
-        router.push("/login");
+        toast.error("Please log in first.");
+
+        setTimeout(() => {
+            router.push("/login");
+        }, 1500);
         return;
       }
 
       if (error instanceof ApiError) {
-        alert(error.message);
+        toast.error(error.message);
         return;
       }
 
-      alert("Comment could not be added.");
+      toast.error("Comment could not be added.");
     }
   }
 

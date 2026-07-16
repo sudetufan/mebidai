@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-
+import { toast } from "sonner";
 import {
   updatePost,
   getPost,
@@ -44,9 +44,9 @@ export default function EditPostPage() {
 
       } catch (error) {
         if (error instanceof ApiError) {
-          alert(error.message);
+          toast.error(error.message);
         } else {
-          alert("Post could not be loaded.");
+            toast.error("Post could not be loaded.");
         }
       }
     }
@@ -58,12 +58,12 @@ export default function EditPostPage() {
     e.preventDefault();
 
     if (!title || !content) {
-      alert("Please fill all fields");
+      toast.error("Please fill in all fields.");
       return;
     }
 
     if (!categoryId) {
-      alert("Please select a category");
+      toast.error("Please select a category.");
       return;
     }
 
@@ -74,16 +74,27 @@ export default function EditPostPage() {
         category_id: categoryId,
       });
 
-      alert("Post updated successfully!");
+      toast.error("Post updated successfully!");
 
-      router.push("/dashboard");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1000);
 
     } catch (error) {
       if (error instanceof ApiError) {
-        alert(error.message);
-      } else {
-        alert("Something went wrong. Please try again.");
-      }
+        if (error.status === 401) {
+            toast.error("Please log in to edit this post.");
+            setTimeout(() => {
+                router.push("/login");
+            }, 1500);
+            return;
+        }
+
+        toast.error(error.message);
+
+        } else {
+            toast.error("Something went wrong. Please try again.");
+        }
     }
   }
 
