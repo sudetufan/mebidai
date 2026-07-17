@@ -61,3 +61,14 @@ class UserSimple(BaseModel):
     class Config:
         from_attributes = True
 
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+
+class PasswordResetConfirm(BaseModel):
+    token: str
+    new_password: str
+
+class RegisterResponse(BaseModel):
+    message: str
+    user: UserResponse

@@ -13,6 +13,10 @@ from app.security import (
 from app.services.verification_service import create_verification_token
 from app.schemas.user import UserCreate
 from app.services.notification_service import create_notification
+from app.services.password_reset_service import (
+    create_reset_token,
+    reset_password,
+)
 
 
 def create_user(
@@ -54,12 +58,15 @@ def create_user(
     db.commit()
     db.refresh(new_user)
 
-    create_verification_token(
+    verification = create_verification_token(
         db=db,
         user_id=new_user.id,
     )
 
-    return new_user
+    return{
+        "user": new_user,
+        "token": verification.token,
+    }
 
 
 def login_user(

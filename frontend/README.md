@@ -6,7 +6,7 @@ Users can register, login, create posts, and comment on posts.
 
 ---
 
-## 🚀 Tech Stack
+##  Tech Stack
 
 ### Backend
 - FastAPI

@@ -23,6 +23,7 @@ from app.models import (
     follow,
     notification,
     email_verification,
+    password_reset,
 )
 
 

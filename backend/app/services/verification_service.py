@@ -70,10 +70,18 @@ def verify_email_token(
             detail="User not found",
         )
 
+    print("Before:", user.is_verified)
+
     user.is_verified = True
     verification.used = True
 
+    print("After set:", user.is_verified)
+
     db.commit()
+
+    db.refresh(user)
+
+    print("After commit:", user.is_verified)
 
     return {
         "message": "Email verified successfully."

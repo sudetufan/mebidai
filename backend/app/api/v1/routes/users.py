@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, Response, HTTPException, Query
 from sqlalchemy.orm import Session
-
 from app.models.user import User
-
 from app.api.dependencies import (
     get_db,
     get_admin_user,
@@ -12,11 +10,21 @@ from app.api.dependencies import (
 from app.services.verification_service import (
     verify_email_token,
 )
+from app.services.email_service import (
+    send_verification_email,
+)
+from app.services.password_reset_service import (
+    create_reset_token,
+    reset_password,
+)
 from app.schemas.user import (
     UserCreate,
     UserLogin,
     UserProfile,
     UserMini,
+    PasswordResetRequest,
+    PasswordResetConfirm,
+    RegisterResponse,
 )
 
 from app.schemas.post import PostResponse
@@ -49,12 +57,22 @@ router = APIRouter(
 )
 
 
-@router.post("/register")
-def register(
+@router.post("/register", response_model=RegisterResponse)
+async def register(
     user: UserCreate,
     db: Session = Depends(get_db),
 ):
-    return create_user(db, user)
+    result = create_user(db, user)
+
+    await send_verification_email(
+        email=result["user"].email,
+        token=result["token"],
+    )
+
+    return {
+        "message": "Registration successful. Please verify your email.",
+        "user": result["user"],
+    }
 
 
 @router.post("/login")
@@ -176,19 +194,33 @@ def verify_email(
         token=token,
     )
 
-@router.get(
-    "/{user_id}/posts",
-    response_model=list[PostResponse],
-)
-def user_posts(
-    user_id: int,
+@router.post("/forgot-password")
+def forgot_password(
+    data: PasswordResetRequest,
     db: Session = Depends(get_db),
 ):
-    return get_user_posts(
+    reset = create_reset_token(
         db,
-        user_id,
+        data.email,
     )
-# PUBLIC USER SEARCH
+
+    return {
+        "message": "Password reset token created.",
+        "token": reset.token,
+    }
+
+
+@router.post("/reset-password")
+def reset_password_endpoint(
+    data: PasswordResetConfirm,
+    db: Session = Depends(get_db),
+):
+    return reset_password(
+        db,
+        data.token,
+        data.new_password,
+    )
+
 @router.get("/search", response_model=list[UserMini])
 def search(
     q: str = Query(...),
@@ -198,22 +230,6 @@ def search(
         db,
         q,
     )
-
-@router.get(
-    "/{user_id}",
-    response_model=UserProfile,
-)
-def user_profile(
-    user_id: int,
-    db: Session = Depends(get_db),
-    current_user: User | None = Depends(get_optional_user),
-):
-    return get_user_profile(
-        db,
-        current_user,
-        user_id,
-    )
-
 
 @router.post("/logout")
 def logout(response: Response):
@@ -236,6 +252,36 @@ def admin_test(
     return {
         "message": f"Welcome Admin {admin.username}"
     }
+
+@router.get(
+    "/{user_id}",
+    response_model=UserProfile,
+)
+def user_profile(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User | None = Depends(get_optional_user),
+):
+    return get_user_profile(
+        db,
+        current_user,
+        user_id,
+    )
+
+@router.get(
+    "/{user_id}/posts",
+    response_model=list[PostResponse],
+)
+def user_posts(
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    return get_user_posts(
+        db,
+        user_id,
+    )
+
+
 
 
 @router.post("/{user_id}/follow")
