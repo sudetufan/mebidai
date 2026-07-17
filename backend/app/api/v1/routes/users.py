@@ -12,6 +12,7 @@ from app.services.verification_service import (
 )
 from app.services.email_service import (
     send_verification_email,
+    send_password_reset_email,
 )
 from app.services.password_reset_service import (
     create_reset_token,
@@ -195,7 +196,7 @@ def verify_email(
     )
 
 @router.post("/forgot-password")
-def forgot_password(
+async def forgot_password(
     data: PasswordResetRequest,
     db: Session = Depends(get_db),
 ):
@@ -204,9 +205,13 @@ def forgot_password(
         data.email,
     )
 
+    await send_password_reset_email(
+        email=data.email,
+        token=reset.token,
+    )
+
     return {
-        "message": "Password reset token created.",
-        "token": reset.token,
+        "message": "Password reset email sent."
     }
 
 
