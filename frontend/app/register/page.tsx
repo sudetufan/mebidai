@@ -8,9 +8,8 @@ import {
   Lock,
 } from "lucide-react";
 import { toast } from "sonner";
-
-import { registerUser, ApiError } from "@/lib/api";
-
+import { GoogleLogin } from "@react-oauth/google";
+import { registerUser, googleLogin, ApiError } from "@/lib/api";
 export default function RegisterPage() {
   const router = useRouter();
 
@@ -71,15 +70,29 @@ export default function RegisterPage() {
         </div>
 
         <div className="bg-white rounded-3xl shadow-lg p-8">
-          <button
-            type="button"
-            className="w-full flex items-center justify-center gap-3 border rounded-xl py-3 font-semibold hover:bg-gray-50 transition"
-          >
-            <span className="font-bold text-xl text-blue-600">
-              G
-            </span>
-            Continue with Google
-          </button>
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              try {
+                if (!credentialResponse.credential) {
+                  toast.error("Google registration failed.");
+                  return;
+                }
+
+                await googleLogin(credentialResponse.credential);
+
+                toast.success("Account created successfully!");
+
+                router.push("/blog");
+
+              } catch (error) {
+                console.error(error);
+                toast.error("Google registration failed.");
+              }
+            }}
+            onError={() => {
+              toast.error("Google registration cancelled.");
+            }}
+          />
 
           <div className="flex items-center gap-4 my-6">
             <div className="h-px bg-gray-200 flex-1" />
