@@ -18,6 +18,8 @@ from app.services.password_reset_service import (
     reset_password,
 )
 
+from math import ceil
+
 
 def create_user(
     db: Session,
@@ -150,10 +152,36 @@ def google_login_user(
     )
 
 
+def get_users(
+    db: Session,
+    page: int = 1,
+    limit: int = 10,
+    query: str | None = None,
+):
+    users_query = db.query(User)
 
-def get_users(db: Session):
-    return db.query(User).all()
+    if query:
+        users_query = users_query.filter(
+            User.username.ilike(f"%{query}%")
+        )
 
+    total = users_query.count()
+
+    users = (
+        users_query
+        .order_by(User.id.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
+
+    return {
+        "items": users,
+        "page": page,
+        "limit": limit,
+        "total": total,
+        "pages": ceil(total / limit) if total else 1,
+    }
 
 
 def delete_user(

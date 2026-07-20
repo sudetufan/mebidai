@@ -76,4 +76,4 @@ def delete(
         db,
         comment_id,
         current_user,
-    )
+    ) 

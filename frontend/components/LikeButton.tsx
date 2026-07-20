@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
-
+import { toast } from "sonner";
 import {
   likePost,
   unlikePost,
@@ -53,7 +53,7 @@ export default function LikeButton({
         return;
       }
 
-      alert("Operation failed.");
+      toast.error("Operation failed.");
     } finally {
       setLoading(false);
     }

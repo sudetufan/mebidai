@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import {
   followUser,
@@ -38,7 +39,7 @@ export default function FollowButton({
         return;
       }
 
-      alert("Something went wrong.");
+      toast.error("Something went wrong.");
     } finally {
       setLoading(false);
     }

@@ -7,12 +7,12 @@ from app.services.notification_service import create_notification
 from app.models.comment import Comment
 from app.models.post import Post
 from app.models.user import User
-
+from sqlalchemy.orm import joinedload
 from app.schemas.comment import (
     CommentCreate,
     CommentUpdate,
 )
-
+from math import ceil
 def create_comment(
     db: Session,
     comment: CommentCreate,
@@ -92,10 +92,43 @@ def get_comments(
         build_comment(comment)
         for comment in comments
     ]
+
+
 def get_all_comments(
     db: Session,
+    page: int = 1,
+    limit: int = 10,
+    query: str | None = None,
 ):
-    return db.query(Comment).all()
+    comments_query = (
+        db.query(Comment)
+        .options(
+            joinedload(Comment.user),
+        )
+    )
+
+    if query:
+        comments_query = comments_query.filter(
+            Comment.content.ilike(f"%{query}%")
+        )
+
+    total = comments_query.count()
+
+    comments = (
+        comments_query
+        .order_by(Comment.id.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
+
+    return {
+        "items": comments,
+        "page": page,
+        "limit": limit,
+        "total": total,
+        "pages": ceil(total / limit) if total else 1,
+    }
 
 def update_comment(
     db: Session,

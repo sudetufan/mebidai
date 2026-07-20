@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-
+from fastapi import APIRouter, Depends, Query
 from app.api.dependencies import (
     get_db,
     get_admin_user,
 )
-
+from fastapi import Query
 from app.models.user import User
 
 from app.schemas.user import UserResponse
@@ -33,47 +32,63 @@ router = APIRouter(
     tags=["Admin"],
 )
 
-
-@router.get(
-    "/users",
-    response_model=list[UserResponse],
-)
+@router.get("/users")
 def read_users(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    query: str | None = None,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):
-    return get_users(db)
+    return get_users(
+        db=db,
+        page=page,
+        limit=limit,
+        query=query,
+    )
 
-
-
-@router.get(
-    "/posts",
-    response_model=list[PostResponse],
-)
+@router.get("/posts")
 def read_posts(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    query: str | None = None,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):
-    return get_posts(
+    data = get_posts(
         db=db,
         current_user=admin,
-        page=1,
-        limit=1000,
-    )["posts"]
+        page=page,
+        limit=limit,
+        query=query,
+    )
 
+    return {
+        "items": data["posts"],
+        "page": data["page"],
+        "limit": data["limit"],
+        "total": data["total"],
+        "pages": (
+            (data["total"] + limit - 1) // limit
+            if data["total"] > 0
+            else 1
+        ),
+    }
 
-
-@router.get(
-    "/comments",
-    response_model=list[CommentResponse],
-)
+@router.get("/comments")
 def read_comments(
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    query: str | None = None,
     db: Session = Depends(get_db),
     admin: User = Depends(get_admin_user),
 ):
-    return get_all_comments(db)
-
-
+    return get_all_comments(
+        db=db,
+        page=page,
+        limit=limit,
+        query=query,
+    )
 
 @router.delete("/posts/{post_id}")
 def remove_post(

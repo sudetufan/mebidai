@@ -29,12 +29,38 @@ export default function AdminPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
+  const [userPage, setUserPage] = useState(1);
+  const [userTotalPages, setUserTotalPages] =
+    useState(1);
+
+  const [postPage, setPostPage] = useState(1);
+  const [postTotalPages, setPostTotalPages] =
+    useState(1);
+
+  const [commentPage, setCommentPage] =
+    useState(1);
+  const [commentTotalPages, setCommentTotalPages] =
+    useState(1);
+
+  const [userQuery, setUserQuery] = useState("");
+  const [postQuery, setPostQuery] = useState("");
+  const [commentQuery, setCommentQuery] =
+    useState("");
+
   const [loading, setLoading] = useState(true);
-  const [authorized, setAuthorized] = useState(false);
+  const [authorized, setAuthorized] =
+    useState(false);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [
+    userPage,
+    postPage,
+    commentPage,
+    userQuery,
+    postQuery,
+    commentQuery,
+  ]);
 
   async function loadData() {
     try {
@@ -44,24 +70,41 @@ export default function AdminPage() {
         commentsRes,
         categoryData,
       ] = await Promise.all([
-        fetch(`${API_URL}/admin/users`, {
-          credentials: "include",
-        }),
+        fetch(
+          `${API_URL}/admin/users?page=${userPage}&limit=10&query=${encodeURIComponent(
+            userQuery
+          )}`,
+          {
+            credentials: "include",
+          }
+        ),
 
-        fetch(`${API_URL}/admin/posts`, {
-          credentials: "include",
-        }),
+        fetch(
+          `${API_URL}/admin/posts?page=${postPage}&limit=10&query=${encodeURIComponent(
+            postQuery
+          )}`,
+          {
+            credentials: "include",
+          }
+        ),
 
-        fetch(`${API_URL}/admin/comments`, {
-          credentials: "include",
-        }),
+        fetch(
+          `${API_URL}/admin/comments?page=${commentPage}&limit=10&query=${encodeURIComponent(
+            commentQuery
+          )}`,
+          {
+            credentials: "include",
+          }
+        ),
 
         getCategories(),
       ]);
 
       const unauthorized =
         [usersRes, postsRes, commentsRes].some(
-          (res) => res.status === 401 || res.status === 403
+          (res) =>
+            res.status === 401 ||
+            res.status === 403
         );
 
       if (unauthorized) {
@@ -70,7 +113,6 @@ export default function AdminPage() {
         );
 
         router.replace("/");
-
         return;
       }
 
@@ -79,23 +121,41 @@ export default function AdminPage() {
         !postsRes.ok ||
         !commentsRes.ok
       ) {
-        throw new Error("Admin data loading failed");
+        throw new Error(
+          "Admin data loading failed"
+        );
       }
 
-      const usersData = await usersRes.json();
-      const postsData = await postsRes.json();
-      const commentsData = await commentsRes.json();
+      const usersData =
+        await usersRes.json();
+      const postsData =
+        await postsRes.json();
+      const commentsData =
+        await commentsRes.json();
 
-      setUsers(usersData);
-      setPosts(postsData);
-      setComments(commentsData);
+      setUsers(usersData.items);
+      setUserTotalPages(usersData.pages);
+
+      setPosts(postsData.items);
+      setPostTotalPages(postsData.pages);
+
+      setComments(commentsData.items);
+      setCommentTotalPages(
+        commentsData.pages
+      );
+
       setCategories(categoryData);
 
       setAuthorized(true);
     } catch (error) {
-      console.error("Admin loading error:", error);
+      console.error(
+        "Admin loading error:",
+        error
+      );
 
-      toast.error("Failed to load admin panel.");
+      toast.error(
+        "Failed to load admin panel."
+      );
 
       router.replace("/");
     } finally {
@@ -128,16 +188,31 @@ export default function AdminPage() {
       <UserManager
         users={users}
         onRefresh={loadData}
+        page={userPage}
+        totalPages={userTotalPages}
+        onPageChange={setUserPage}
+        query={userQuery}
+        onQueryChange={setUserQuery}
       />
 
       <PostManager
         posts={posts}
         onRefresh={loadData}
+        page={postPage}
+        totalPages={postTotalPages}
+        onPageChange={setPostPage}
+        query={postQuery}
+        onQueryChange={setPostQuery}
       />
 
       <CommentManager
         comments={comments}
         onRefresh={loadData}
+        page={commentPage}
+        totalPages={commentTotalPages}
+        onPageChange={setCommentPage}
+        query={commentQuery}
+        onQueryChange={setCommentQuery}
       />
     </main>
   );

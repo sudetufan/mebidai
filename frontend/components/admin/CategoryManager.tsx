@@ -6,7 +6,7 @@ import {
   createCategory,
   deleteCategory,
 } from "@/lib/api";
-
+import { toast } from "sonner";
 type Category = {
   id: number;
   name: string;
@@ -38,7 +38,7 @@ export default function CategoryManager({
 
       onRefresh();
     } catch {
-      alert("Category could not be created.");
+        toast.error("Category could not be created.");
     }
   }
 
@@ -54,7 +54,7 @@ export default function CategoryManager({
 
       onRefresh();
     } catch {
-      alert("Category could not be deleted.");
+      toast.error("Category could not be deleted.");
     }
   }
 
