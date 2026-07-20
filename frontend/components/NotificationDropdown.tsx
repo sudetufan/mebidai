@@ -15,6 +15,8 @@ import {
   markNotificationAsRead,
 } from "@/lib/api";
 
+import { useAuth } from "@/context/AuthContext";
+
 type Notification = {
   id: number;
   type: string;
@@ -29,31 +31,48 @@ type Notification = {
 export default function NotificationDropdown() {
   const router = useRouter();
 
+  const { user } = useAuth();
+
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+
   async function loadNotifications() {
+    if (!user) {
+      setNotifications([]);
+      return;
+    }
+
     try {
       const data = await getNotifications();
       setNotifications(data);
-    } catch (error) {
-      console.error(error);
+    } catch {
+      setNotifications([]);
     }
   }
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
 
   useEffect(() => {
+    if (user) {
+      loadNotifications();
+    } else {
+      setNotifications([]);
+    }
+  }, [user]);
+
+
+  useEffect(() => {
+    if (!user) return;
+
     const interval = setInterval(() => {
       loadNotifications();
     }, 30000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
+
 
   useEffect(() => {
     if (!open) return;
@@ -80,6 +99,7 @@ export default function NotificationDropdown() {
     };
   }, [open]);
 
+
   async function handleNotificationClick(
     notification: Notification
   ) {
@@ -101,36 +121,38 @@ export default function NotificationDropdown() {
 
       setOpen(false);
 
+
       if (notification.type === "follow") {
         router.push(`/profile/${notification.sender_id}`);
         router.refresh();
         return;
       }
 
-    if (
+
+      if (
         ["like", "comment", "mention"].includes(
-            notification.type
+          notification.type
         ) &&
         notification.post_id !== null
-    ) {
-
+      ) {
         if (notification.comment_id !== null) {
-            router.push(
-                `/blog/${notification.post_id}#comment-${notification.comment_id}`
-            );
+          router.push(
+            `/blog/${notification.post_id}#comment-${notification.comment_id}`
+          );
         } else {
-            router.push(
-                `/blog/${notification.post_id}`
-            );
+          router.push(
+            `/blog/${notification.post_id}`
+          );
         }
 
         router.refresh();
-        return;
-    }
-    } catch (error) {
-      console.error(error);
+      }
+
+    } catch {
+      // sessiz bırakıyoruz
     }
   }
+
 
   function getNotificationMessage(type: string) {
     switch (type) {
@@ -151,6 +173,7 @@ export default function NotificationDropdown() {
     }
   }
 
+
   function getRelativeTime(date: string) {
     const now = new Date();
     const created = new Date(date);
@@ -159,37 +182,40 @@ export default function NotificationDropdown() {
       (now.getTime() - created.getTime()) / 1000
     );
 
-    if (diff < 60)
-      return `${diff} second${
-        diff !== 1 ? "s" : ""
-      } ago`;
+
+    if (diff < 60) {
+      return `${diff} second${diff !== 1 ? "s" : ""} ago`;
+    }
+
 
     const minutes = Math.floor(diff / 60);
 
-    if (minutes < 60)
-      return `${minutes} minute${
-        minutes !== 1 ? "s" : ""
-      } ago`;
+    if (minutes < 60) {
+      return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+    }
+
 
     const hours = Math.floor(minutes / 60);
 
-    if (hours < 24)
-      return `${hours} hour${
-        hours !== 1 ? "s" : ""
-      } ago`;
+    if (hours < 24) {
+      return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+    }
+
 
     const days = Math.floor(hours / 24);
 
-    if (days < 7)
-      return `${days} day${
-        days !== 1 ? "s" : ""
-      } ago`;
+    if (days < 7) {
+      return `${days} day${days !== 1 ? "s" : ""} ago`;
+    }
+
 
     return created.toLocaleDateString();
   }
 
+
   function getNotificationIcon(type: string) {
     switch (type) {
+
       case "like":
         return (
           <Heart
@@ -197,6 +223,7 @@ export default function NotificationDropdown() {
             className="fill-red-500 text-red-500"
           />
         );
+
 
       case "comment":
         return (
@@ -206,6 +233,7 @@ export default function NotificationDropdown() {
           />
         );
 
+
       case "follow":
         return (
           <UserPlus
@@ -214,6 +242,7 @@ export default function NotificationDropdown() {
           />
         );
 
+
       case "mention":
         return (
           <AtSign
@@ -221,6 +250,7 @@ export default function NotificationDropdown() {
             className="text-orange-500"
           />
         );
+
 
       default:
         return (
@@ -232,22 +262,27 @@ export default function NotificationDropdown() {
     }
   }
 
+
   const unreadCount = notifications.filter(
     (notification) => !notification.is_read
   ).length;
+
 
   return (
     <div
       ref={dropdownRef}
       className="relative"
     >
+
       <button
         onClick={() => {
-          if (!open) {
+
+          if (!open && user) {
             loadNotifications();
           }
 
           setOpen(!open);
+
         }}
         className="
           relative
@@ -258,7 +293,9 @@ export default function NotificationDropdown() {
           hover:text-blue-400
         "
       >
+
         <Bell size={20} />
+
 
         {unreadCount > 0 && (
           <span
@@ -282,9 +319,12 @@ export default function NotificationDropdown() {
             {unreadCount}
           </span>
         )}
+
       </button>
 
+
       {open && (
+
         <div
           className="
             absolute
@@ -300,19 +340,26 @@ export default function NotificationDropdown() {
             shadow-2xl
           "
         >
+
           <div className="border-b border-slate-700 px-4 py-3">
             <h3 className="font-semibold text-white">
               Notifications
             </h3>
           </div>
 
+
           <div className="max-h-[420px] overflow-y-auto">
-                      {notifications.length === 0 ? (
+
+            {notifications.length === 0 ? (
+
               <div className="p-6 text-center text-sm text-gray-400">
                 No notifications yet.
               </div>
+
             ) : (
+
               notifications.map((notification) => (
+
                 <div
                   key={notification.id}
                   onClick={() =>
@@ -334,6 +381,7 @@ export default function NotificationDropdown() {
                     }
                   `}
                 >
+
                   <div
                     className="
                       mt-0.5
@@ -352,24 +400,33 @@ export default function NotificationDropdown() {
                     )}
                   </div>
 
+
                   <div className="min-w-0 flex-1">
+
                     <p className="text-sm leading-5 text-white">
+
                       <span className="font-semibold">
                         {notification.sender_username}
                       </span>{" "}
+
                       {getNotificationMessage(
                         notification.type
                       )}
+
                     </p>
+
 
                     <p className="mt-1 text-xs text-gray-400">
                       {getRelativeTime(
                         notification.created_at
                       )}
                     </p>
+
                   </div>
 
+
                   {!notification.is_read && (
+
                     <div
                       className="
                         mt-2
@@ -380,13 +437,20 @@ export default function NotificationDropdown() {
                         bg-blue-500
                       "
                     />
+
                   )}
+
                 </div>
+
               ))
+
             )}
+
           </div>
 
+
           {notifications.length > 0 && (
+
             <div
               className="
                 border-t
@@ -398,12 +462,18 @@ export default function NotificationDropdown() {
                 text-gray-400
               "
             >
+
               {unreadCount} unread notification
               {unreadCount !== 1 ? "s" : ""}
+
             </div>
+
           )}
+
         </div>
+
       )}
+
     </div>
   );
 }
