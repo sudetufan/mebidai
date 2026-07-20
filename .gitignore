@@ -1,12 +1,23 @@
+# Python
 venv/
 .venv/
 
 __pycache__/
 *.pyc
 
+# Environment files
 .env
+.env.local
 
-mebidai.db
-test.db
-
+# Database
 *.db
+
+# Next.js
+node_modules/
+.next/
+
+# OS files
+.DS_Store
+
+# Editor
+.vscode/
