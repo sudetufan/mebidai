@@ -60,7 +60,7 @@ The platform allows users to create blog posts, discover content, interact throu
 ## Backend
 
 - FastAPI
-- SQLAlchemy
+- SQLAlchemy ORM
 - SQLite Database
 - Pydantic
 - JWT Authentication
@@ -74,23 +74,50 @@ The platform allows users to create blog posts, discover content, interact throu
 MEBIDAI
 │
 ├── backend
-│   ├── app
-│   │   ├── api
-│   │   ├── models
-│   │   ├── schemas
-│   │   ├── services
-│   │   ├── database
-│   │   └── main.py
-│   │
-│   └── requirements.txt
+│ ├── app
+│ │ ├── api
+│ │ │ └── v1
+│ │ │ └── routes
+│ │ │
+│ │ ├── db
+│ │ │
+│ │ ├── models
+│ │ │
+│ │ ├── schemas
+│ │ │
+│ │ ├── services
+│ │ │
+│ │ └── main.py
+│ │
+│ └── requirements.txt
 │
 ├── frontend
-│   ├── app
-│   ├── components
-│   ├── context
-│   ├── lib
-│   ├── types
-│   └── package.json
+│ ├── app
+│ │ ├── admin
+│ │ ├── blog
+│ │ ├── category
+│ │ ├── dashboard
+│ │ ├── edit-post
+│ │ ├── forgot-password
+│ │ ├── login
+│ │ ├── profile
+│ │ ├── register
+│ │ ├── reset-password
+│ │ ├── users
+│ │ └── verify-email
+│ │
+│ ├── components
+│ │ ├── admin
+│ │ ├── Navbar.tsx
+│ │ ├── Footer.tsx
+│ │ ├── BlogList.tsx
+│ │ ├── PostCard.tsx
+│ │ └── ...
+│ │
+│ ├── context
+│ ├── lib
+│ ├── types
+│ └── package.json
 │
 └── README.md
 ```
@@ -249,9 +276,19 @@ Next.js application
 
 FastAPI REST API
 
-## Database
+## Database:
 
-SQLAlchemy based database layer
+SQLite database managed with SQLAlchemy ORM
+
+# API Documentation
+
+Backend provides REST API endpoints.
+
+Swagger UI:
+http://localhost:8000/docs
+
+ReDoc:
+http://localhost:8000/redoc
 
 
 # Author
