@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import ConfirmModal from "@/components/ConfirmModal";
 import { toast } from "sonner";
@@ -11,9 +11,13 @@ const API_URL = "http://localhost:8000/api/v1";
 type Props = {
   comments: Comment[];
   onRefresh: () => void;
+
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+
+  query: string;
+  onQueryChange: (value: string) => void;
 };
 
 export default function CommentManager({
@@ -22,28 +26,14 @@ export default function CommentManager({
   page,
   totalPages,
   onPageChange,
+  query,
+  onQueryChange,
 }: Props) {
   const [confirmOpen, setConfirmOpen] =
     useState(false);
 
   const [selectedComment, setSelectedComment] =
     useState<Comment | null>(null);
-
-  const [search, setSearch] = useState("");
-
-  const filteredComments = useMemo(() => {
-    const text = search.toLowerCase();
-
-    return comments.filter(
-      (comment) =>
-        comment.content
-          .toLowerCase()
-          .includes(text) ||
-        comment.user.username
-          .toLowerCase()
-          .includes(text)
-    );
-  }, [comments, search]);
 
   async function deleteComment() {
     if (!selectedComment) return;
@@ -82,15 +72,16 @@ export default function CommentManager({
         <input
           type="text"
           placeholder="Search comments..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-          className="w-72 rounded-lg border px-4 py-2"
+          value={query}
+          onChange={(e) => {
+            onPageChange(1);
+            onQueryChange(e.target.value);
+          }}
+          className="w-72 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
-      {filteredComments.map((comment) => (
+      {comments.map((comment) => (
         <div
           key={comment.id}
           className="mb-3 flex items-center justify-between rounded-xl bg-white p-4 shadow"
@@ -120,9 +111,7 @@ export default function CommentManager({
       <div className="mt-6 flex items-center justify-center gap-4">
         <button
           disabled={page === 1}
-          onClick={() =>
-            onPageChange(page - 1)
-          }
+          onClick={() => onPageChange(page - 1)}
           className="rounded-lg border px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Previous
@@ -134,9 +123,7 @@ export default function CommentManager({
 
         <button
           disabled={page === totalPages}
-          onClick={() =>
-            onPageChange(page + 1)
-          }
+          onClick={() => onPageChange(page + 1)}
           className="rounded-lg border px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Next

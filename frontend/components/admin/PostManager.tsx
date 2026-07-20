@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import ConfirmModal from "@/components/ConfirmModal";
 import { toast } from "sonner";
@@ -11,9 +11,13 @@ const API_URL = "http://localhost:8000/api/v1";
 type Props = {
   posts: AdminPost[];
   onRefresh: () => void;
+
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+
+  query: string;
+  onQueryChange: (value: string) => void;
 };
 
 export default function PostManager({
@@ -22,28 +26,13 @@ export default function PostManager({
   page,
   totalPages,
   onPageChange,
+  query,
+  onQueryChange,
 }: Props) {
-  const [confirmOpen, setConfirmOpen] =
-    useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [selectedPost, setSelectedPost] =
     useState<AdminPost | null>(null);
-
-  const [search, setSearch] = useState("");
-
-  const filteredPosts = useMemo(() => {
-    const text = search.toLowerCase();
-
-    return posts.filter(
-      (post) =>
-        post.title
-          .toLowerCase()
-          .includes(text) ||
-        post.user.username
-          .toLowerCase()
-          .includes(text)
-    );
-  }, [posts, search]);
 
   async function deletePost() {
     if (!selectedPost) return;
@@ -60,15 +49,11 @@ export default function PostManager({
       setConfirmOpen(false);
       setSelectedPost(null);
 
-      toast.success(
-        "Post deleted successfully."
-      );
+      toast.success("Post deleted successfully.");
 
       onRefresh();
     } else {
-      toast.error(
-        "Post could not be deleted."
-      );
+      toast.error("Post could not be deleted.");
     }
   }
 
@@ -82,15 +67,16 @@ export default function PostManager({
         <input
           type="text"
           placeholder="Search posts..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-          className="w-72 rounded-lg border px-4 py-2"
+          value={query}
+          onChange={(e) => {
+            onPageChange(1);
+            onQueryChange(e.target.value);
+          }}
+          className="w-72 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
-      {filteredPosts.map((post) => (
+      {posts.map((post) => (
         <div
           key={post.id}
           className="mb-3 flex items-center justify-between rounded-xl bg-white p-4 shadow"
@@ -120,9 +106,7 @@ export default function PostManager({
       <div className="mt-6 flex items-center justify-center gap-4">
         <button
           disabled={page === 1}
-          onClick={() =>
-            onPageChange(page - 1)
-          }
+          onClick={() => onPageChange(page - 1)}
           className="rounded-lg border px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Previous
@@ -134,9 +118,7 @@ export default function PostManager({
 
         <button
           disabled={page === totalPages}
-          onClick={() =>
-            onPageChange(page + 1)
-          }
+          onClick={() => onPageChange(page + 1)}
           className="rounded-lg border px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Next

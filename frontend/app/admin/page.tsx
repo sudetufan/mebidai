@@ -30,15 +30,12 @@ export default function AdminPage() {
   const [categories, setCategories] = useState<Category[]>([]);
 
   const [userPage, setUserPage] = useState(1);
-  const [userTotalPages, setUserTotalPages] =
-    useState(1);
+  const [userTotalPages, setUserTotalPages] = useState(1);
 
   const [postPage, setPostPage] = useState(1);
-  const [postTotalPages, setPostTotalPages] =
-    useState(1);
+  const [postTotalPages, setPostTotalPages] = useState(1);
 
-  const [commentPage, setCommentPage] =
-    useState(1);
+  const [commentPage, setCommentPage] = useState(1);
   const [commentTotalPages, setCommentTotalPages] =
     useState(1);
 
@@ -52,7 +49,7 @@ export default function AdminPage() {
     useState(false);
 
   useEffect(() => {
-    loadData();
+    void loadData();
   }, [
     userPage,
     postPage,
@@ -63,6 +60,8 @@ export default function AdminPage() {
   ]);
 
   async function loadData() {
+    setLoading(true);
+
     try {
       const [
         usersRes,
@@ -122,14 +121,16 @@ export default function AdminPage() {
         !commentsRes.ok
       ) {
         throw new Error(
-          "Admin data loading failed"
+          "Admin data loading failed."
         );
       }
 
       const usersData =
         await usersRes.json();
+
       const postsData =
         await postsRes.json();
+
       const commentsData =
         await commentsRes.json();
 
@@ -147,7 +148,7 @@ export default function AdminPage() {
       setCategories(categoryData);
 
       setAuthorized(true);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(
         "Admin loading error:",
         error
@@ -168,7 +169,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="max-w-6xl mx-auto py-10 px-6">
+    <main className="mx-auto max-w-6xl px-6 py-10">
       <h1 className="mb-8 text-4xl font-bold">
         Admin Panel
       </h1>
