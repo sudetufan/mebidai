@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Lock } from "lucide-react";
 import { toast } from "sonner";
 
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function ResetPasswordForm() {
   const router = useRouter();

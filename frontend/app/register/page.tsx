@@ -18,7 +18,7 @@ import {
 
 import { useAuth } from "@/context/AuthContext";
 
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -97,7 +97,6 @@ export default function RegisterPage() {
             );
             break;
 
-
           default:
             toast.error(
               error.message
@@ -132,15 +131,10 @@ export default function RegisterPage() {
       toast.success(
         "Account created successfully!"
       );
-
-
       router.push("/blog");
-
-
     } catch (error) {
 
       console.error(error);
-
       toast.error(
         "Google registration failed."
       );
@@ -166,11 +160,7 @@ export default function RegisterPage() {
           </p>
 
         </div>
-
-
         <div className="bg-white rounded-3xl shadow-lg p-8">
-
-
           <GoogleLogin
 
             onSuccess={(response) => {
@@ -183,15 +173,11 @@ export default function RegisterPage() {
 
                 return;
               }
-
-
               handleGoogleRegister(
                 response.credential
               );
 
             }}
-
-
             onError={() => {
 
               toast.error(
@@ -201,8 +187,6 @@ export default function RegisterPage() {
             }}
 
           />
-
-
           <div className="flex items-center gap-4 my-6">
 
             <div className="h-px bg-gray-200 flex-1" />
@@ -220,8 +204,6 @@ export default function RegisterPage() {
             onSubmit={handleSubmit}
             className="space-y-5"
           >
-
-
             <div>
 
               <label className="text-sm font-semibold">
@@ -235,36 +217,24 @@ export default function RegisterPage() {
                   size={18}
                   className="absolute left-3 top-3.5 text-gray-400"
                 />
-
-
                 <input
-
                   type="text"
-
                   placeholder="Username"
-
                   className="w-full rounded-xl border pl-10 pr-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-
                   value={username}
-
                   onChange={(e) =>
                     setUsername(e.target.value)
                   }
-
                 />
 
               </div>
 
             </div>
-
-
-
             <div>
 
               <label className="text-sm font-semibold">
                 Email
               </label>
-
 
               <div className="relative mt-2">
 
@@ -272,8 +242,6 @@ export default function RegisterPage() {
                   size={18}
                   className="absolute left-3 top-3.5 text-gray-400"
                 />
-
-
                 <input
 
                   type="email"
@@ -293,9 +261,6 @@ export default function RegisterPage() {
               </div>
 
             </div>
-
-
-
             <div>
 
               <label className="text-sm font-semibold">
@@ -309,8 +274,6 @@ export default function RegisterPage() {
                   size={18}
                   className="absolute left-3 top-3.5 text-gray-400"
                 />
-
-
                 <input
 
                   type="password"
@@ -330,9 +293,6 @@ export default function RegisterPage() {
               </div>
 
             </div>
-
-
-
             <button
 
               type="submit"
@@ -340,14 +300,11 @@ export default function RegisterPage() {
               className="w-full rounded-xl bg-green-600 py-3 font-semibold text-white hover:bg-green-700 transition"
 
             >
-
               Create Account
 
             </button>
 
-
           </form>
-
 
           <p className="text-center text-sm text-gray-500 mt-6">
 
@@ -362,7 +319,6 @@ export default function RegisterPage() {
             >
 
               Login
-
             </a>
 
           </p>

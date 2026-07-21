@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function VerifyEmailPage() {
   const [message, setMessage] = useState("Email doğrulanıyor...");
   const [success, setSuccess] = useState(false);
@@ -19,7 +21,7 @@ export default function VerifyEmailPage() {
 
       try {
         const response = await fetch(
-          `http://localhost:8000/api/v1/users/verify-email?token=${token}`
+          `${API_URL}/users/verify-email?token=${token}`
         );
 
         const data = await response.json();

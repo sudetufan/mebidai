@@ -14,12 +14,13 @@ SMTP_PORT = int(os.getenv("SMTP_PORT"))
 SMTP_USERNAME = os.getenv("SMTP_USERNAME")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 SMTP_FROM = os.getenv("SMTP_FROM")
+FRONTEND_URL = os.getenv("FRONTEND_URL")
 
 
 async def send_verification_email(email: str, token: str):
 
     verify_link = (
-        f"http://localhost:3000/verify-email?token={token}"
+        f"{FRONTEND_URL}/verify-email?token={token}"
     )
 
     msg = MIMEMultipart("alternative")
@@ -70,7 +71,7 @@ async def send_verification_email(email: str, token: str):
 async def send_password_reset_email(email: str, token: str):
 
     reset_link = (
-        f"http://localhost:3000/reset-password?token={token}"
+        f"{FRONTEND_URL}/reset-password?token={token}"
     )
 
     msg = MIMEMultipart("alternative")

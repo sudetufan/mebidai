@@ -14,7 +14,7 @@ import {
 
 import { useAuth } from "@/context/AuthContext";
 
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function LoginPage() {
   const router = useRouter();

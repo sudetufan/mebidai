@@ -6,7 +6,7 @@ import ConfirmModal from "@/components/ConfirmModal";
 import { toast } from "sonner";
 import { AdminPost } from "@/types";
 
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type Props = {
   posts: AdminPost[];
