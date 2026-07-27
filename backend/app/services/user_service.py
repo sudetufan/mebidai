@@ -189,12 +189,7 @@ def delete_user(
     user_id: int,
     current_user: User,
 ):
-
-    user = (
-        db.query(User)
-        .filter(User.id == user_id)
-        .first()
-    )
+    user = db.query(User).filter(User.id == user_id).first()
 
     if not user:
         raise HTTPException(
@@ -202,13 +197,11 @@ def delete_user(
             detail="User not found",
         )
 
-
     if user.id == current_user.id:
         raise HTTPException(
             status_code=400,
             detail="You cannot delete your own account",
         )
-
 
     if user.role == "admin":
         raise HTTPException(
@@ -216,14 +209,24 @@ def delete_user(
             detail="Admin users cannot be deleted",
         )
 
+    try:
+        db.query(Comment).filter(Comment.user_id == user_id).delete(synchronize_session=False)
+        if hasattr(Post, 'author_id'):
+            db.query(Post).filter(Post.author_id == user_id).delete(synchronize_session=False)
+        elif hasattr(Post, 'user_id'):
+            db.query(Post).filter(Post.user_id == user_id).delete(synchronize_session=False)
+        db.delete(user)
+        db.commit()
 
-    db.delete(user)
-    db.commit()
+        return {"message": "User deleted successfully"}
 
-    return {
-        "message": "User deleted successfully"
-    }
-
+    except Exception as e:
+        db.rollback()
+        print(f"SİLME HATASI DETAYI: {str(e)}") 
+        raise HTTPException(
+            status_code=500,
+            detail=f"Database error during deletion: {str(e)}"
+        )
 
 
 def get_profile(
@@ -457,6 +460,7 @@ def get_user_profile(
         "username": user.username,
         "email": user.email,
         "role": user.role,
+        "bio": user.bio,
         "post_count": post_count,
         "comment_count": comment_count,
         "like_count": like_count,
@@ -497,4 +501,62 @@ def get_user_by_username(
     return {
         "id": user.id,
         "username": user.username,
+    }
+
+def update_username(
+    db: Session,
+    current_user: User,
+    username: str,
+):
+    username = username.strip()
+
+    if not username:
+        raise HTTPException(
+            status_code=400,
+            detail="Username cannot be empty",
+        )
+    if username == current_user.username:
+        return {
+            "message": "Username is already up to date",
+            "username": current_user.username,
+        }
+
+    existing_user = (
+        db.query(User)
+        .filter(
+            User.username == username,
+            User.id != current_user.id,
+        )
+        .first()
+    )
+
+    if existing_user:
+        raise HTTPException(
+            status_code=409,
+            detail="Username already taken",
+        )
+
+    current_user.username = username
+
+    db.commit()
+    db.refresh(current_user)
+
+    return {
+        "message": "Username updated successfully",
+        "username": current_user.username,
+    }
+
+def update_bio(
+    db: Session,
+    current_user: User,
+    bio: str,
+):
+    current_user.bio = bio.strip()
+
+    db.commit()
+    db.refresh(current_user)
+
+    return {
+        "message": "Bio updated successfully",
+        "bio": current_user.bio,
     }

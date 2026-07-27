@@ -40,12 +40,9 @@ def get_current_user(
             SECRET_KEY,
             algorithms=[ALGORITHM],
         )
-
         email = payload.get("sub")
-
         if email is None:
             raise credentials_exception
-
     except JWTError:
         raise credentials_exception
 
@@ -76,12 +73,9 @@ def get_optional_user(
             SECRET_KEY,
             algorithms=[ALGORITHM],
         )
-
         email = payload.get("sub")
-
         if email is None:
             return None
-
     except JWTError:
         return None
 

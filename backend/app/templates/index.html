@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}
+MEBIDAI - Horizon Europe Research & Innovation Hub
+{% endblock %}
+
+{% block content %}
+
+<div class="home-page">
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <span style="font-size: 0.85rem; font-weight: 600; color: #4f46e5; background: #e0e7ff; padding: 6px 14px; border-radius: 20px; display: inline-block; margin-bottom: 16px;">
+                🇪🇺 Horizon Europe Research Community
+            </span>
+            <h1>Fostering Innovation.<br>Connecting European Researchers.</h1>
+            <p>MEBIDAI is a collaborative dissemination platform for Horizon Europe consortia, research partners, and technology developers to share project outcomes, deliverables, and technical insights.</p>
+            
+            <div class="hero-actions">
+                <a href="/blog" class="home-btn">Explore Project Outcomes →</a>
+                {% if not current_user %}
+                <a href="/register" class="outline-btn">Join Consortium Network</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section class="about-section">
+        <div class="section-title">
+            <h2>Research & Innovation Framework</h2>
+            <p>Empowering European research collaboration and knowledge dissemination.</p>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div style="font-size: 28px; margin-bottom: 12px;">🇪🇺</div>
+                <h3>Project Deliverables</h3>
+                <p>Publish work package updates, research papers, and technical reports for EU-funded calls.</p>
+            </div>
+
+            <div class="feature-card">
+                <div style="font-size: 28px; margin-bottom: 12px;">🤝</div>
+                <h3>Consortium Collaboration</h3>
+                <p>Connect academic institutions, SME partners, and industry leaders across Horizon Europe clusters.</p>
+            </div>
+
+            <div class="feature-card">
+                <div style="font-size: 28px; margin-bottom: 12px;">🔬</div>
+                <h3>Innovation & Impact</h3>
+                <p>Maximize the exploitation and open-access dissemination of cutting-edge technological breakthroughs.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PLATFORM / CTA SECTION -->
+    <section class="platform-section">
+        <div class="platform-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div>
+                <h2 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 8px;">Are you leading a Horizon Europe Work Package?</h2>
+                <p style="margin: 0;">Share your research milestones, open data, and technological breakthroughs with the global scientific community.</p>
+            </div>
+            {% if not current_user %}
+            <a href="/register" class="home-btn" style="white-space: nowrap;">Register as Researcher</a>
+            {% else %}
+            <a href="/create-post" class="home-btn" style="white-space: nowrap;">Publish Project Update</a>
+            {% endif %}
+        </div>
+    </section>
+
+</div>
+
+{% endblock %}

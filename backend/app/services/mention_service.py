@@ -1,7 +1,6 @@
 import re
-
+from markupsafe import escape, Markup
 from sqlalchemy.orm import Session
-
 from app.models.user import User
 from app.services.notification_service import create_notification
 
@@ -39,3 +38,15 @@ def process_mentions(
             post_id=post_id,
             comment_id=comment_id,
         )
+
+
+def mention_links(content: str):
+    if not content:
+        return ""
+    escaped_content = str(escape(content))
+    processed_content = re.sub(
+        r"@([A-Za-zA-Z0-9_]+)",
+        r'<a href="/users/\1">@\1</a>',
+        escaped_content
+    )
+    return Markup(processed_content)

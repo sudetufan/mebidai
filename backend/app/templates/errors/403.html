@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>403 - Access Denied</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', path='css/error.css') }}"
+    >
+</head>
+<body>
+
+<div class="error-container">
+
+    <div class="error-code">
+        403
+    </div>
+
+    <h1 class="error-title">
+        Access Denied
+    </h1>
+
+    <p class="error-message">
+        You don't have permission to access this page.
+    </p>
+
+    <a
+        href="/"
+        class="home-button"
+    >
+        Go Home
+    </a>
+
+</div>
+
+</body>
+</html>

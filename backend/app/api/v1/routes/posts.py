@@ -1,25 +1,20 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-
 from app.api.dependencies import (
     get_db,
     get_current_user,
     get_optional_user,
 )
-
 from app.models.user import User
-
 from app.schemas.post import (
     PostCreate,
     PostResponse,
     PaginatedPostsResponse,
 )
-
 from app.services.like_service import (
     like_post,
     unlike_post,
 )
-
 from app.services.post_service import (
     create_post,
     get_posts,
@@ -27,14 +22,12 @@ from app.services.post_service import (
     update_post,
     delete_post,
     search_posts,
+    get_post_likes,
 )
-
 router = APIRouter(
     prefix="/posts",
     tags=["Posts"],
 )
-
-
 @router.post("/", response_model=PostResponse)
 def create(
     post: PostCreate,
@@ -46,8 +39,6 @@ def create(
         post,
         current_user.id,
     )
-
-
 @router.get("/", response_model=PaginatedPostsResponse)
 def read_posts(
     page: int = Query(1, ge=1),
@@ -65,8 +56,6 @@ def read_posts(
         category_id,
         q,
     )
-
-
 @router.get("/search", response_model=list[PostResponse])
 def search(
     q: str,
@@ -80,8 +69,6 @@ def search(
         current_user,
         category_id,
     )
-
-
 @router.get("/{post_id}")
 def read_post(
     post_id: int,
@@ -93,8 +80,6 @@ def read_post(
         post_id,
         current_user,
     )
-
-
 @router.put("/{post_id}", response_model=PostResponse)
 def update(
     post_id: int,
@@ -108,8 +93,6 @@ def update(
         post,
         current_user,
     )
-
-
 @router.delete("/{post_id}")
 def delete(
     post_id: int,
@@ -121,8 +104,6 @@ def delete(
         post_id,
         current_user,
     )
-
-
 @router.post("/{post_id}/like")
 def like(
     post_id: int,
@@ -134,8 +115,6 @@ def like(
         post_id,
         current_user,
     )
-
-
 @router.delete("/{post_id}/like")
 def unlike(
     post_id: int,
@@ -147,3 +126,19 @@ def unlike(
         post_id,
         current_user,
     )
+@router.get("/{post_id}/likes")
+async def get_likes(
+    post_id: int,
+    db: Session = Depends(get_db),
+):
+    users = get_post_likes(
+        db=db,
+        post_id=post_id,
+    )
+    return [
+        {
+            "id": user.id,
+            "username": user.username,
+        }
+        for user in users
+    ]

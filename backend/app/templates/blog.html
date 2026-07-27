@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}
+Discover - MEBIDAI Blog
+{% endblock %}
+
+{% block content %}
+
+<!-- Toast / Error Notification -->
+{% if request.query_params.get("error") == "no_permission" %}
+<div id="toast-message" style="position: fixed; top: 20px; right: 20px; z-index: 9999; background: #ef4444; color: white; padding: 12px 20px; border-radius: 8px; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px;">
+    <span>🚫 You do not have permission to edit or delete this item.</span>
+    <button onclick="document.getElementById('toast-message').remove()" style="background: none; border: none; color: white; cursor: pointer; font-size: 16px;">✕</button>
+</div>
+
+<script>
+    setTimeout(() => {
+        const toast = document.getElementById('toast-message');
+        if (toast) {
+            toast.style.transition = "opacity 0.4s ease";
+            toast.style.opacity = "0";
+            setTimeout(() => toast.remove(), 400);
+        }
+    }, 4000);
+</script>
+{% endif %}
+
+<!-- Sade ve Şık Blog Header -->
+<div class="blog-header" style="margin-bottom: 2rem;">
+    <div>
+        <span style="font-size: 0.85rem; font-weight: 600; color: #4f46e5; background: #e0e7ff; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 8px;">
+            Developer Hub
+        </span>
+        <h1 style="margin: 0 0 6px 0; font-size: 2rem; font-weight: 700; color: #1e293b;">
+            Explore Tech Stories
+        </h1>
+        <p style="margin: 0; color: #64748b; font-size: 0.95rem;">
+            Discover tutorials, technology insights, and coding adventures.
+        </p>
+    </div>
+
+    {% if current_user %}
+    <a class="primary-btn small-btn" href="/create-post">
+        + Create Post
+    </a>
+    {% endif %}
+</div>
+
+<!-- Search & Categories Bar -->
+<div class="blog-tools">
+
+    <div class="categories">
+        <h3>Categories</h3>
+
+        <div class="category-list">
+            {% if selected_category %}
+                <a href="/blog">All</a>
+            {% else %}
+                <strong>All</strong>
+            {% endif %}
+
+            {% for category in categories %}
+                {% if selected_category == category.id %}
+                    <strong>{{ category.name }}</strong>
+                {% else %}
+                    <a href="/blog?category_id={{ category.id }}">{{ category.name }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <form class="search-box" method="get">
+        {% if selected_category %}
+            <input type="hidden" name="category_id" value="{{ selected_category }}">
+        {% endif %}
+
+        <input
+            type="text"
+            name="q"
+            placeholder="Search posts..."
+            value="{{ query or '' }}"
+        >
+
+        <button type="submit">Search</button>
+    </form>
+
+</div>
+
+<!-- Posts Grid -->
+<div class="post-grid">
+
+{% if posts %}
+
+{% for post in posts %}
+
+<div class="post-card">
+
+    <h2>
+        <a href="/posts/{{ post.id }}">
+            {{ post.title }}
+        </a>
+    </h2>
+
+    <p class="post-content">
+        {{ post.content[:180] }}...
+    </p>
+
+    <div class="post-meta">
+        <span>{{ post.user.username }}</span>
+        <span>{{ post.category.name }}</span>
+        <span>❤️ {{ post.like_count }}</span>
+    </div>
+
+    <a class="read-more" href="/posts/{{ post.id }}">
+        Read More →
+    </a>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<div class="card">
+    <p>No posts found.</p>
+</div>
+
+{% endif %}
+
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+
+{% if page > 1 %}
+<a href="/blog?page={{ page - 1 }}{% if selected_category %}&category_id={{ selected_category }}{% endif %}{% if query %}&q={{ query }}{% endif %}">
+← Previous
+</a>
+{% endif %}
+
+<span>Page {{ page }}</span>
+
+{% if page * limit < total %}
+<a href="/blog?page={{ page + 1 }}{% if selected_category %}&category_id={{ selected_category }}{% endif %}{% if query %}&q={{ query }}{% endif %}">
+Next →
+</a>
+{% endif %}
+
+</div>
+
+{% endblock %}

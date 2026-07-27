@@ -6,26 +6,21 @@ from app.api.dependencies import (
 )
 from fastapi import Query
 from app.models.user import User
-
 from app.schemas.user import UserResponse
 from app.schemas.post import PostResponse
 from app.schemas.comment import CommentResponse
-
 from app.services.user_service import (
     get_users,
     delete_user,
 )
-
 from app.services.post_service import (
     get_posts,
     delete_post,
 )
-
 from app.services.comment_service import (
     get_all_comments,
     delete_comment,
 )
-
 
 router = APIRouter(
     prefix="/admin",
@@ -102,8 +97,6 @@ def remove_post(
         admin,
     )
 
-
-
 @router.delete("/comments/{comment_id}")
 def remove_comment(
     comment_id: int,
@@ -115,8 +108,6 @@ def remove_comment(
         comment_id,
         admin,
     )
-
-
 
 @router.delete("/users/{user_id}")
 def delete_user_endpoint(

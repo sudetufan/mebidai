@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block title %}
+Admin Panel
+{% endblock %}
+{% block content %}
+<div class="admin-header">
+    <div>
+        <h1>Admin Panel</h1>
+        <p>Welcome {{ current_user.username }}</p>
+    </div>
+</div>
+
+<div class="admin-cards">
+    <div class="admin-card">
+        <h3>{{ users_count }}</h3>
+        <p>Users</p>
+    </div>
+    <div class="admin-card">
+        <h3>{{ posts_count }}</h3>
+        <p>Posts</p>
+    </div>
+    <div class="admin-card">
+        <h3>{{ comments_count }}</h3>
+        <p>Comments</p>
+    </div>
+</div>
+
+<!-- USERS TABLE -->
+<div class="admin-table-card">
+    <h2>Users</h2>
+    <form method="get" action="/admin" onsubmit="saveScroll()">
+        <input type="text" name="user_query" value="{{ user_query or '' }}" placeholder="Search user...">
+        <input type="hidden" name="post_query" value="{{ post_query or '' }}">
+        <input type="hidden" name="comment_query" value="{{ comment_query or '' }}">
+        <input type="hidden" name="post_page" value="{{ post_page }}">
+        <input type="hidden" name="comment_page" value="{{ comment_page }}">
+        <button type="submit">Search</button>
+    </form>
+    <br>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td>
+                    {% if user.id != current_user.id %}
+                    <button 
+                        type="button" 
+                        class="admin-delete" 
+                        onclick="openDeleteModal('/api/v1/admin/users/{{ user.id }}', 'Delete user {{ user.username }}?')"
+                    >
+                        Delete
+                    </button>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if user_page > 1 %}
+        <a href="/admin?user_page={{ user_page-1 }}&post_page={{ post_page }}&comment_page={{ comment_page }}&user_query={{ user_query or '' }}&post_query={{ post_query or '' }}&comment_query={{ comment_query or '' }}">← Previous</a>
+        {% endif %}
+        <span>Page {{ user_page }} / {{ users_pages }}</span>
+        {% if user_page < users_pages %}
+        <a href="/admin?user_page={{ user_page+1 }}&post_page={{ post_page }}&comment_page={{ comment_page }}&user_query={{ user_query or '' }}&post_query={{ post_query or '' }}&comment_query={{ comment_query or '' }}">Next →</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- POSTS TABLE -->
+<div class="admin-table-card">
+    <h2>Posts</h2>
+    <form method="get" action="/admin" onsubmit="saveScroll()">
+        <input type="text" name="post_query" value="{{ post_query or '' }}" placeholder="Search post...">
+        <input type="hidden" name="user_query" value="{{ user_query or '' }}">
+        <input type="hidden" name="comment_query" value="{{ comment_query or '' }}">
+        <input type="hidden" name="user_page" value="{{ user_page }}">
+        <input type="hidden" name="comment_page" value="{{ comment_page }}">
+        <button type="submit">Search</button>
+    </form>
+    <br>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for post in posts %}
+            <tr>
+                <td>{{ post.title }}</td>
+                <td>
+                    <button 
+                        type="button" 
+                        class="admin-delete" 
+                        onclick="openDeleteModal('/api/v1/admin/posts/{{ post.id }}', 'Delete post?')"
+                    >
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if post_page > 1 %}
+        <a href="/admin?user_page={{ user_page }}&post_page={{ post_page-1 }}&comment_page={{ comment_page }}&user_query={{ user_query or '' }}&post_query={{ post_query or '' }}&comment_query={{ comment_query or '' }}">← Previous</a>
+        {% endif %}
+        <span>Page {{ post_page }} / {{ posts_pages }}</span>
+        {% if post_page < posts_pages %}
+        <a href="/admin?user_page={{ user_page }}&post_page={{ post_page+1 }}&comment_page={{ comment_page }}&user_query={{ user_query or '' }}&post_query={{ post_query or '' }}&comment_query={{ comment_query or '' }}">Next →</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- COMMENTS TABLE -->
+<div class="admin-table-card">
+    <h2>Comments</h2>
+    <form method="get" action="/admin" onsubmit="saveScroll()">
+        <input type="text" name="comment_query" value="{{ comment_query or '' }}" placeholder="Search comment...">
+        <input type="hidden" name="user_query" value="{{ user_query or '' }}">
+        <input type="hidden" name="post_query" value="{{ post_query or '' }}">
+        <input type="hidden" name="user_page" value="{{ user_page }}">
+        <input type="hidden" name="post_page" value="{{ post_page }}">
+        <button type="submit">Search</button>
+    </form>
+    <br>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Content</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for comment in comments %}
+            <tr>
+                <td>{{ comment.content }}</td>
+                <td>
+                    <button 
+                        type="button" 
+                        class="admin-delete" 
+                        onclick="openDeleteModal('/api/v1/admin/comments/{{ comment.id }}', 'Delete comment?')"
+                    >
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="pagination">
+        {% if comment_page > 1 %}
+        <a href="/admin?user_page={{ user_page }}&post_page={{ post_page }}&comment_page={{ comment_page-1 }}&user_query={{ user_query or '' }}&post_query={{ post_query or '' }}&comment_query={{ comment_query or '' }}">← Previous</a>
+        {% endif %}
+        <span>Page {{ comment_page }} / {{ comments_pages }}</span>
+        {% if comment_page < comments_pages %}
+        <a href="/admin?user_page={{ user_page }}&post_page={{ post_page }}&comment_page={{ comment_page+1 }}&user_query={{ user_query or '' }}&post_query={{ post_query or '' }}&comment_query={{ comment_query or '' }}">Next →</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- MODAL -->
+<div id="confirmModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <p id="confirmText">Are you sure?</p>
+        <button type="button" id="cancelDelete" onclick="closeDeleteModal()">Cancel</button>
+        <button type="button" id="confirmDelete" onclick="executeDelete()">Delete</button>
+    </div>
+</div>
+
+<script>
+let currentDeleteUrl = "";
+
+function openDeleteModal(url, message) {
+    currentDeleteUrl = url;
+    document.getElementById("confirmText").textContent = message;
+    
+    // Modal açma garantisi
+    const modal = document.getElementById("confirmModal");
+    modal.classList.add("show");
+    modal.style.display = "flex"; // CSS class takılsa bile görünür yap
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById("confirmModal");
+    modal.classList.remove("show");
+    modal.style.display = "none";
+    currentDeleteUrl = "";
+}
+
+async function executeDelete() {
+    if (!currentDeleteUrl) return;
+
+    try {
+        const response = await fetch(currentDeleteUrl, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || "Delete failed");
+        }
+
+        closeDeleteModal();
+
+        if (typeof showToast === "function") {
+            showToast("Deleted successfully");
+        } else {
+            alert("Deleted successfully");
+        }
+
+        setTimeout(() => {
+            location.reload();
+        }, 500);
+
+    } catch (error) {
+        console.error("Delete error:", error);
+        if (typeof showToast === "function") {
+            showToast(error.message || "Delete failed", "error");
+        } else {
+            alert(error.message || "Delete failed");
+        }
+    }
+}
+
+function saveScroll() {
+    sessionStorage.setItem("adminScrollPosition", window.scrollY);
+}
+
+window.addEventListener("load", function() {
+    const position = sessionStorage.getItem("adminScrollPosition");
+    if (position) {
+        window.scrollTo(0, Number(position));
+        sessionStorage.removeItem("adminScrollPosition");
+    }
+});
+</script>
+{% endblock %}

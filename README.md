@@ -1,136 +1,103 @@
-# MEBIDAI Community Platform
+# MEBIDAI
 
-MEBIDAI is a developer community platform where users can share technical content, interact with other developers, and build their own developer profiles.
-
-The platform allows users to create blog posts, discover content, interact through comments and likes, follow other users, and receive notifications.
+MEBIDAI is a developer community platform built with **FastAPI**, **Jinja2**, **HTML**, **CSS**, and **JavaScript**. It allows users to create, share, and interact with blog posts while providing authentication, notifications, and an administration panel.
 
 ## Features
 
-### User Management
+### User Features
 
-- User registration and login
-- Email verification system
-- Google OAuth authentication
-- Forgot password and password reset system
-- User profile pages
-- Profile statistics
-- Secure password hashing
+* User registration and login
+* Google OAuth login
+* Email verification
+* Forgot password / Reset password
+* Create, edit, and delete blog posts
+* Like and comment on posts
+* Follow and unfollow users
+* User profile page
+* User search
+* Mention system (`@username`)
+* Notification system
+* Account settings
 
-### Blog System
+  * Change username
+  * Change password
 
-- Create, edit, and delete blog posts
-- Category-based content organization
-- Post search functionality
-- Pagination support
-- Post detail pages
-- Like system
-- Comment system
+### Admin Features
 
-### Social Features
+* Admin dashboard
+* User management
+* Post management
+* Comment management
+* Category management
+* Pagination support
 
-- Follow and unfollow users
-- User interaction notifications
-- Mention system in comments
-- Notification dropdown
-- User discovery and search
+### Other Features
 
-### Admin Panel
+* Responsive interface
+* Custom 403, 404 and 500 error pages
+* SQLite database
+* Server-side rendering with Jinja2
 
-- Admin authentication and authorization
-- User management
-- Post management
-- Comment management
-- Category management
-- Search functionality
-- Pagination support
-- Delete operations with confirmation modals
+---
 
+# Technologies
 
-# Tech Stack
+### Backend
 
-## Frontend
+* FastAPI
+* SQLAlchemy
+* SQLite
+* Jinja2
+* Pydantic
+* Uvicorn
 
-- Next.js 16
-- React
-- TypeScript
-- Tailwind CSS
-- Sonner Toast Notifications
-- Lucide React Icons
+### Frontend
 
-## Backend
+* HTML5
+* CSS3
+* JavaScript
 
-- FastAPI
-- SQLAlchemy ORM
-- SQLite Database
-- Pydantic
-- JWT Authentication
-- Google OAuth Verification
-- SMTP Email Service
+### Authentication
 
+* JWT Authentication
+* Google OAuth 2.0
+
+### Email
+
+* SMTP
+* FastAPI-Mail
+
+---
 
 # Project Structure
 
 ```text
-MEBIDAI
+backend/
 │
-├── backend
-│ ├── app
-│ │ ├── api
-│ │ │ └── v1
-│ │ │ └── routes
-│ │ │
-│ │ ├── db
-│ │ │
-│ │ ├── models
-│ │ │
-│ │ ├── schemas
-│ │ │
-│ │ ├── services
-│ │ │
-│ │ └── main.py
-│ │
-│ └── requirements.txt
+├── app/
+│   ├── api/
+│   ├── db/
+│   ├── models/
+│   ├── schemas/
+│   ├── services/
+│   ├── static/
+│   ├── templates/
+│   ├── security.py
+│   └── main.py
 │
-├── frontend
-│ ├── app
-│ │ ├── admin
-│ │ ├── blog
-│ │ ├── category
-│ │ ├── dashboard
-│ │ ├── edit-post
-│ │ ├── forgot-password
-│ │ ├── login
-│ │ ├── profile
-│ │ ├── register
-│ │ ├── reset-password
-│ │ ├── users
-│ │ └── verify-email
-│ │
-│ ├── components
-│ │ ├── admin
-│ │ ├── Navbar.tsx
-│ │ ├── Footer.tsx
-│ │ ├── BlogList.tsx
-│ │ ├── PostCard.tsx
-│ │ └── ...
-│ │
-│ ├── context
-│ ├── lib
-│ ├── types
-│ └── package.json
-│
-└── README.md
+├── requirements.txt
+└── mebidai.db
 ```
 
+---
 
 # Installation
 
-## Backend Setup
-
-Navigate to the backend directory:
+Clone the repository:
 
 ```bash
-cd backend
+git clone <repository-url>
+cd mebidai/backend
 ```
 
 Create a virtual environment:
@@ -141,7 +108,13 @@ python -m venv .venv
 
 Activate the virtual environment:
 
-Mac/Linux:
+### Windows
+
+```bash
+.venv\Scripts\activate
+```
+
+### macOS / Linux
 
 ```bash
 source .venv/bin/activate
@@ -153,144 +126,54 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Run the backend server:
+Create a `.env` file and configure the required environment variables.
+
+Run the project:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Backend will run on:
+Open your browser:
 
 ```
-http://localhost:8000
+http://127.0.0.1:8000
 ```
 
-
-## Frontend Setup
-
-Open another terminal and navigate to the frontend directory:
-
-```bash
-cd frontend
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Run the development server:
-
-```bash
-npm run dev
-```
-
-Frontend will run on:
-
-```
-http://localhost:3000
-```
-
+---
 
 # Environment Variables
 
-## Frontend
-
-Create a `.env.local` file:
+Example `.env`
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+SECRET_KEY=your_secret_key
+
+GOOGLE_CLIENT_ID=your_google_client_id
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email
+SMTP_PASSWORD=your_app_password
 ```
 
-## Backend
+---
 
-Required environment variables:
+# Screenshots
 
-```env
-DATABASE_URL
-SECRET_KEY
-GOOGLE_CLIENT_ID
-SMTP_HOST
-SMTP_PORT
-SMTP_EMAIL
-SMTP_PASSWORD
-```
+You can add screenshots of:
 
+* Home Page
+* Login
+* Register
+* Blog
+* Profile
+* Admin Panel
+* Settings
+* Notifications
 
-# Authentication System
-
-MEBIDAI provides multiple authentication methods:
-
-- Email and password authentication
-- Email verification system
-- Google OAuth login
-- Password reset via email link
-
-The authentication system uses secure password hashing and token-based verification flows.
-
-
-# Database Models
-
-Main database entities:
-
-- User
-- Post
-- Comment
-- Category
-- Like
-- Follow
-- Notification
-- EmailVerificationToken
-- PasswordResetToken
-
-
-# Development Tools
-
-- Visual Studio Code
-- Git
-- GitHub
-- Postman
-- Chrome Developer Tools
-
-
-# Future Improvements
-
-Planned future improvements:
-
-- Premium membership system
-- Educational package integration
-- AI assistant integration
-- Mobile application development
-
-
-# Deployment
-
-The project is structured as a full-stack application with a separate frontend and backend architecture.
-
-## Frontend
-
-Next.js application
-
-## Backend
-
-FastAPI REST API
-
-## Database:
-
-SQLite database managed with SQLAlchemy ORM
-
-# API Documentation
-
-Backend provides REST API endpoints.
-
-Swagger UI:
-http://localhost:8000/docs
-
-ReDoc:
-http://localhost:8000/redoc
-
+---
 
 # Author
 
-Sude Tufan
+Developed as a Computer Engineering project using FastAPI and Jinja2.

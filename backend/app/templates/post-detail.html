@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ post.title }}
+{% endblock %}
+
+{% block content %}
+
+<section class="post-detail-page">
+
+    <article class="post-detail-card">
+
+        <div class="post-header">
+
+            <h1>{{ post.title }}</h1>
+
+            <div class="post-meta">
+
+                <span>
+                    <a href="/users/{{ post.user.username }}">
+                        {{ post.user.username }}
+                    </a>
+                </span>
+
+                <span>
+                    {{ post.category.name }}
+                </span>
+
+            </div>
+
+        </div>
+
+        <hr>
+
+        <div class="post-body">
+            {{ post.content }}
+        </div>
+
+        <div class="like-area">
+
+            <form 
+                method="post"
+                action="/posts/{{ post.id }}/{{ 'unlike' if post.liked else 'like' }}"
+            >
+                <button
+                    type="submit"
+                    class="like-btn {% if post.liked %}liked{% endif %}"
+                    aria-label="{% if post.liked %}Unlike{% else %}Like{% endif %}"
+                >
+                    {% if post.liked %}
+                        ♥
+                    {% else %}
+                        ♡
+                    {% endif %}
+                </button>
+
+            </form>
+
+            <button
+                type="button"
+                class="likes-count"
+                onclick="openLikesModal('{{ post.id }}')"
+            >
+                {{ post.like_count }}
+            </button>
+
+        </div>
+
+    </article>
+
+    {% if current_user and (current_user.id == post.user_id or current_user.role == "admin") %}
+
+    <div class="action-card">
+
+        <h3>
+            Post Actions
+        </h3>
+
+        <a href="/posts/{{ post.id }}/edit">
+            Edit Post
+        </a>
+
+        <form method="post" action="/posts/{{ post.id }}/delete">
+
+            <button class="danger-btn">
+                Delete Post
+            </button>
+
+        </form>
+
+    </div>
+
+    {% endif %}
+
+    <section class="comments-section">
+
+        <h2>Comments</h2>
+
+        {% if comments %}
+
+            {% for comment in comments %}
+
+            <div class="comment-card" id="comment-{{ comment.id }}">
+
+                <div class="comment-main-body">
+                    <strong class="comment-author">
+                        <a href="/users/{{ comment.user.username }}">
+                            {{ comment.user.username }}
+                        </a>
+                    </strong>
+
+                    <p class="comment-content">
+                        {{ comment.content | mention_links | safe }}
+                    </p>
+
+                    <div class="comment-footer">
+                        {% if current_user %}
+                        <button 
+                            type="button" 
+                            class="reply-toggle-btn"
+                            onclick="toggleReplyForm('{{ comment.id }}')"
+                        >
+                            Reply
+                        </button>
+                        {% endif %}
+
+                        {% if current_user and current_user.id == comment.user_id %}
+                        <a href="/comments/{{ comment.id }}/edit" class="edit-link">
+                            Edit
+                        </a>
+                        {% endif %}
+
+                        {% if current_user and (current_user.id == comment.user_id or current_user.role == "admin") %}
+                        <form method="post" action="/comments/{{ comment.id }}/delete" style="display:inline;">
+                            <button class="danger-btn small">
+                                Delete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Yanıt Açılır Formu -->
+                {% if current_user %}
+                <div id="reply-form-{{ comment.id }}" class="reply-form-wrapper" style="display: none;">
+                    <form method="post" action="/posts/{{ post.id }}/comment">
+                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                        <textarea 
+                            name="content" 
+                            placeholder="Write a reply to @{{ comment.user.username }}..." 
+                            required
+                        ></textarea>
+                        <div class="reply-form-actions">
+                            <button type="submit" class="comment-btn small">
+                                Send
+                            </button>
+                            <button type="button" class="cancel-btn small" onclick="toggleReplyForm('{{ comment.id }}')">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+
+                <!-- Alt Yanıtlar Listesi (Nested Replies) -->
+                {% if comment.replies %}
+                <div class="replies-wrapper">
+                    {% for reply in comment.replies %}
+                    <div class="reply-item" id="comment-{{ reply.id }}">
+                        <strong class="comment-author">
+                            <a href="/users/{{ reply.user.username }}">
+                                {{ reply.user.username }}
+                            </a>
+                        </strong>
+
+                        <p class="comment-content">
+                            {{ reply.content | mention_links | safe }}
+                        </p>
+
+                        <div class="comment-footer">
+                            {% if current_user and current_user.id == reply.user_id %}
+                            <a href="/comments/{{ reply.id }}/edit" class="edit-link">
+                                Edit
+                            </a>
+                            {% endif %}
+
+                            {% if current_user and (current_user.id == reply.user_id or current_user.role == "admin") %}
+                            <form method="post" action="/comments/{{ reply.id }}/delete" style="display:inline;">
+                                <button class="danger-btn small">
+                                    Delete
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>No comments yet.</p>
+
+        {% endif %}
+
+        {% if current_user %}
+
+        <div class="comment-form">
+
+            <h3>Add Comment</h3>
+
+            <form method="post" action="/posts/{{ post.id }}/comment">
+
+                <div class="mention-wrapper">
+
+                    <textarea
+                        id="commentInput"
+                        name="content"
+                        placeholder="Write your comment..."
+                        required
+                    ></textarea>
+
+                    <div
+                        id="mentionResults"
+                        class="mention-results"
+                    ></div>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="comment-btn"
+                >
+                    Add Comment
+                </button>
+
+            </form>
+
+        </div>
+
+        {% else %}
+
+        <p>You must be logged in to write a comment.</p>
+
+        {% endif %}
+
+    </section>
+
+</section>
+
+<div
+    id="likesModal"
+    class="modal"
+>
+
+    <div class="modal-content">
+
+        <span
+            class="close"
+            onclick="closeLikesModal()"
+        >
+            ×
+        </span>
+
+        <h2>
+            Liked by
+        </h2>
+
+        <ul
+            id="likesList"
+            class="user-list"
+        ></ul>
+
+    </div>
+
+</div>
+
+<script src="/static/js/comment-mention.js"></script>
+<script src="/static/js/post-likes.js"></script>
+
+<script>
+function toggleReplyForm(commentId) {
+    const form = document.getElementById(`reply-form-${commentId}`);
+    if (form) {
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+}
+</script>
+
+<style>
+/* Ana yorum kartı düzeni */
+.comment-card {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: #ffffff;
+    border: 1px solid #eef0f3;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+}
+
+.comment-main-body {
+    display: block !important;
+    width: 100% !important;
+}
+
+.comment-footer {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-top: 8px !important;
+    justify-content: flex-start !important;
+}
+
+.reply-toggle-btn {
+    background: none !important;
+    border: none !important;
+    color: #4f46e5 !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    font-size: 0.9rem !important;
+}
+
+.reply-toggle-btn:hover {
+    text-decoration: underline !important;
+}
+
+.edit-link {
+    color: #6b7280 !important;
+    font-size: 0.88rem !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+}
+
+/* Yanıt Kapsayıcısı ve Sol Çizgi */
+.replies-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    margin-top: 12px !important;
+    margin-left: 8px !important;
+    padding-left: 16px !important;
+    border-left: 2px solid #6366f1 !important;
+    width: auto !important;
+}
+
+/* Yanıt Kartının Kendisi */
+.reply-item {
+    display: block !important;
+    width: 100% !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+/* Yanıt Formu */
+.reply-form-wrapper {
+    margin-top: 12px !important;
+    padding: 12px !important;
+    background: #f1f5f9 !important;
+    border-radius: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.reply-form-wrapper textarea {
+    width: 100% !important;
+    min-height: 60px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    padding: 8px !important;
+    box-sizing: border-box !important;
+    resize: vertical !important;
+}
+
+.reply-form-actions {
+    display: flex !important;
+    gap: 8px !important;
+    margin-top: 8px !important;
+}
+
+.cancel-btn {
+    background: #e2e8f0 !important;
+    color: #475569 !important;
+    border: none !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+}
+</style>
+
+{% endblock %}

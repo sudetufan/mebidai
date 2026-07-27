@@ -18,11 +18,7 @@ class EmailVerificationToken(Base):
     )
 
     token = Column(String, unique=True, nullable=False, index=True)
-
     created_at = Column(DateTime, default=datetime.utcnow)
-
     expires_at = Column(DateTime, nullable=False)
-
     used = Column(Boolean, default=False, nullable=False)
-
     user = relationship("User")

@@ -8,7 +8,6 @@ class PostCreate(BaseModel):
     content: str
     category_id: int
 
-
 class CategorySimple(BaseModel):
     id: int
     name: str
@@ -16,7 +15,6 @@ class CategorySimple(BaseModel):
     model_config = ConfigDict(
         from_attributes=True
     )
-
 
 class PostResponse(PostCreate):
     id: int
@@ -29,7 +27,6 @@ class PostResponse(PostCreate):
     model_config = ConfigDict(
         from_attributes=True
     )
-
 
 class PaginatedPostsResponse(BaseModel):
     posts: list[PostResponse]

@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
+from math import ceil
 
 from app.models.category import Category
 from app.models.like import Like
@@ -26,9 +27,7 @@ def prepare_posts(
                 )
                 .first()
             )
-
             post.liked = liked is not None
-
         else:
             post.liked = False
 
@@ -40,7 +39,6 @@ def create_post(
     post: PostCreate,
     user_id: int,
 ) -> Post:
-
     new_post = Post(
         title=post.title,
         content=post.content,
@@ -63,7 +61,6 @@ def get_posts(
     category_id: int | None = None,
     query: str | None = None,
 ):
-
     skip = (page - 1) * limit
 
     total_query = (
@@ -129,8 +126,8 @@ def get_posts(
         "total": total,
         "page": page,
         "limit": limit,
+        "pages": ceil(total / limit) if total else 1,
     }
-
 
 
 def get_post(
@@ -138,7 +135,6 @@ def get_post(
     post_id: int,
     current_user: User | None,
 ):
-
     post = (
         db.query(Post)
         .options(
@@ -149,19 +145,15 @@ def get_post(
         .first()
     )
 
-
     if not post:
         raise HTTPException(
             status_code=404,
             detail="Post not found",
         )
 
-
     post.like_count = len(post.likes)
 
-
     if current_user:
-
         liked = (
             db.query(Like)
             .filter(
@@ -170,15 +162,11 @@ def get_post(
             )
             .first()
         )
-
         post.liked = liked is not None
-
     else:
         post.liked = False
 
-
     return post
-
 
 
 def update_post(
@@ -187,20 +175,17 @@ def update_post(
     post: PostCreate,
     current_user: User,
 ):
-
     existing_post = (
         db.query(Post)
         .filter(Post.id == post_id)
         .first()
     )
 
-
     if not existing_post:
         raise HTTPException(
             status_code=404,
             detail="Post not found",
         )
-
 
     if (
         existing_post.user_id != current_user.id
@@ -211,18 +196,14 @@ def update_post(
             detail="You cannot update this post",
         )
 
-
     existing_post.title = post.title
     existing_post.content = post.content
     existing_post.category_id = post.category_id
 
-
     db.commit()
     db.refresh(existing_post)
 
-
     return existing_post
-
 
 
 def delete_post(
@@ -230,20 +211,17 @@ def delete_post(
     post_id: int,
     current_user: User,
 ):
-
     post = (
         db.query(Post)
         .filter(Post.id == post_id)
         .first()
     )
 
-
     if not post:
         raise HTTPException(
             status_code=404,
             detail="Post not found",
         )
-
 
     if (
         post.user_id != current_user.id
@@ -254,22 +232,16 @@ def delete_post(
             detail="You cannot delete this post",
         )
 
-
     db.delete(post)
     db.commit()
 
-
-    return {
-        "message": "Post deleted successfully"
-    }
-
+    return {"message": "Post deleted successfully"}
 
 
 def get_user_posts(
     db: Session,
     user_id: int,
 ):
-
     posts = (
         db.query(Post)
         .options(
@@ -281,12 +253,12 @@ def get_user_posts(
         .all()
     )
 
-
     return prepare_posts(
         posts,
         db,
         None,
     )
+
 
 def search_posts(
     db: Session,
@@ -325,4 +297,29 @@ def search_posts(
         posts,
         db,
         current_user,
+    )
+
+
+def get_post_likes(
+    db: Session,
+    post_id: int,
+):
+    post = (
+        db.query(Post)
+        .filter(Post.id == post_id)
+        .first()
+    )
+
+    if not post:
+        raise HTTPException(
+            status_code=404,
+            detail="Post not found",
+        )
+
+    return (
+        db.query(User)
+        .join(Like, Like.user_id == User.id)
+        .filter(Like.post_id == post_id)
+        .order_by(User.username)
+        .all()
     )

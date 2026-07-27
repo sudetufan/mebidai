@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ profile_user['username'] if profile_user else 'User' }} - MEBIDAI
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-container">
+    
+    <!-- Profil Header Kartı -->
+    <div class="profile-card">
+        
+        <!-- Avatar / Profil İkonu -->
+        <div class="profile-avatar">
+            {{ (profile_user['username'][0] | upper) if profile_user and profile_user['username'] else 'U' }}
+        </div>
+
+        <!-- Kullanıcı Adı & Rozet -->
+        <h1 class="profile-username">
+            {{ profile_user['username'] if profile_user else 'User' }}
+        </h1>
+        
+        <span class="profile-badge">
+            Horizon Europe Contributor
+        </span>
+
+        <!-- Bio -->
+        <p class="profile-bio {% if not profile_user or not profile_user['bio'] %}empty{% endif %}">
+            {% if profile_user and profile_user['bio'] %}
+                {{ profile_user['bio'] }}
+            {% else %}
+                No bio added yet.
+            {% endif %}
+        </p>
+
+        <!-- İstatistikler -->
+        <div class="profile-stats">
+            <div>
+                <strong>
+                    {{ posts | length if posts is defined and posts else 0 }}
+                </strong>
+                <span>Posts</span>
+            </div>
+            <div class="stat-click" onclick="openFollowers()">
+                <strong>
+                    {% if followers is defined and followers %}{{ followers | length }}{% elif followers_count is defined and followers_count %}{{ followers_count }}{% else %}0{% endif %}
+                </strong>
+                <span>Followers</span>
+            </div>
+            <div class="stat-click" onclick="openFollowing()">
+                <strong>
+                    {% if following is defined and following %}{{ following | length }}{% elif following_count is defined and following_count %}{{ following_count }}{% else %}0{% endif %}
+                </strong>
+                <span>Following</span>
+            </div>
+        </div>
+
+        <!-- Takip Et / Takipten Çık Buton Alanı -->
+        {% if current_user and profile_user and current_user.id != profile_user['id'] %}
+        <div class="follow-button" style="margin-top: 24px;">
+            {% if is_following %}
+                <form method="post" action="/users/{{ profile_user['id'] }}/unfollow" style="margin: 0;">
+                    <button type="submit" class="danger-btn">Unfollow</button>
+                </form>
+            {% else %}
+                <form method="post" action="/users/{{ profile_user['id'] }}/follow" style="margin: 0;">
+                    <button type="submit" class="home-btn">Follow</button>
+                </form>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Yayınlanan Gönderiler Bölümü -->
+    <div class="profile-posts">
+        <h2 class="profile-posts-title">
+            Published Articles
+        </h2>
+
+        {% if posts is defined and posts %}
+            <div class="post-grid">
+                {% for post in posts %}
+                <div class="post-card">
+                    <h2>
+                        <a href="/posts/{{ post.id }}">
+                            {{ post.title }}
+                        </a>
+                    </h2>
+
+                    <p class="post-content">
+                        {{ post.content[:150] if post.content else '' }}...
+                    </p>
+
+                    <div class="post-meta">
+                        <span>Category: {{ post.category.name if post.category is defined and post.category else 'General' }}</span>
+                        <span>Likes: {{ post.like_count if post.like_count is defined and post.like_count else 0 }}</span>
+                    </div>
+
+                    <a class="read-more" href="/posts/{{ post.id }}">
+                        Read Article →
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-posts-card">
+                <p>No articles published yet.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Followers Modal -->
+<div id="followersModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Followers</h3>
+            <span class="close" onclick="closeModals()">&times;</span>
+        </div>
+        <ul class="user-list">
+            {% if followers is defined and followers %}
+                {% for f in followers %}
+                    <li>
+                        <a href="/users/{{ f.username if f.username is defined else f }}">
+                            <span class="user-avatar-small">{{ (f.username[0] | upper) if f.username is defined and f.username else 'U' }}</span>
+                            {{ f.username if f.username is defined else f }}
+                        </a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li class="empty-list-item">No followers yet.</li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+<!-- Following Modal -->
+<div id="followingModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Following</h3>
+            <span class="close" onclick="closeModals()">&times;</span>
+        </div>
+        <ul class="user-list">
+            {% if following is defined and following %}
+                {% for f in following %}
+                    <li>
+                        <a href="/users/{{ f.username if f.username is defined else f }}">
+                            <span class="user-avatar-small">{{ (f.username[0] | upper) if f.username is defined and f.username else 'U' }}</span>
+                            {{ f.username if f.username is defined else f }}
+                        </a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li class="empty-list-item">Not following anyone yet.</li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+<script src="/static/js/profile.js"></script>
+
+{% endblock %}

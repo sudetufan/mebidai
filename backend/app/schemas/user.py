@@ -25,6 +25,7 @@ class UserResponse(BaseModel):
     username: str
     email: EmailStr
     role: str
+    bio: str | None = None
 
     class Config:
         from_attributes = True
@@ -35,7 +36,7 @@ class UserProfile(BaseModel):
     username: str
     email: EmailStr
     role: str
-
+    bio: str | None = None
     post_count: int
     comment_count: int
     like_count: int
@@ -72,3 +73,9 @@ class PasswordResetConfirm(BaseModel):
 class RegisterResponse(BaseModel):
     message: str
     user: UserResponse
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_password: str
+class BioUpdate(BaseModel):
+    bio: str

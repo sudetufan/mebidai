@@ -12,7 +12,6 @@ def create_notification(
     post_id: int | None = None,
     comment_id: int | None = None,
 ):
-
     notification = Notification(
         recipient_id=recipient_id,
         sender_id=sender_id,
@@ -32,43 +31,30 @@ def get_notifications(
     db: Session,
     user_id: int,
 ):
-
     notifications = (
         db.query(Notification)
-        .filter(
-            Notification.recipient_id == user_id
-        )
-        .order_by(
-            Notification.created_at.desc()
-        )
+        .filter(Notification.recipient_id == user_id)
+        .order_by(Notification.created_at.desc())
         .all()
     )
-
 
     result = []
 
     for notification in notifications:
-
         sender = (
             db.query(User)
-            .filter(
-                User.id == notification.sender_id
-            )
+            .filter(User.id == notification.sender_id)
             .first()
         )
-
 
         result.append(
             {
                 "id": notification.id,
                 "type": notification.type,
-
-                "sender_id": sender.id,
-                "sender_username": sender.username,
-
+                "sender_id": sender.id if sender else 0,
+                "sender_username": sender.username if sender else "Deleted User",
                 "is_read": notification.is_read,
                 "created_at": notification.created_at,
-
                 "post_id": notification.post_id,
                 "comment_id": notification.comment_id,
             }
@@ -77,13 +63,11 @@ def get_notifications(
     return result
 
 
-
 def mark_notification_as_read(
     db: Session,
     notification_id: int,
     user_id: int,
 ):
-
     notification = (
         db.query(Notification)
         .filter(
@@ -93,10 +77,8 @@ def mark_notification_as_read(
         .first()
     )
 
-
     if not notification:
         return None
-
 
     notification.is_read = True
 
