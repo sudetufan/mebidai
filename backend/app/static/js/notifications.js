@@ -1,19 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const btn = document.getElementById("notificationBtn");
-    const dropdown = document.getElementById("notificationDropdown");
-    const count = document.getElementById("notificationCount");
+    let notificationInterval = null;
 
-    if (!btn) {
-        return;
-    }
-
-    btn.addEventListener("click", function () {
-        dropdown.classList.toggle("show");
-    });
-
-    async function loadNotifications() {
+    async function fetchNotifications() {
         try {
             const response = await fetch("/api/v1/notifications/");
+
+            if (response.status === 401) {
+                if (notificationInterval) {
+                    clearInterval(notificationInterval);
+                }
+                return;
+            }
 
             if (!response.ok) {
                 return;
@@ -22,83 +19,58 @@ document.addEventListener("DOMContentLoaded", function () {
             const notifications = await response.json();
             renderNotifications(notifications);
         } catch (error) {
-            console.error("Notification error:", error);
+            console.error("Notification fetch error:", error);
         }
     }
 
     function renderNotifications(notifications) {
-        dropdown.innerHTML = "";
-        let unread = 0;
+        const dropdown = document.querySelector(".notifications-dropdown") || document.getElementById("notificationsDropdown");
+        const badge = document.querySelector(".notification-badge") || document.getElementById("notificationBadge");
 
-        if (notifications.length === 0) {
-            dropdown.innerHTML = `<p>No notifications</p>`;
-            count.style.display = "none";
+        if (!dropdown) return;
+
+        if (!notifications || notifications.length === 0) {
+            dropdown.innerHTML = `<p class="empty-notif" style="padding: 10px; text-align: center; color: #888;">No notifications</p>`;
+            if (badge) badge.style.display = "none";
             return;
         }
 
+        const unreadCount = notifications.filter(n => !n.is_read).length;
+        if (badge) {
+            if (unreadCount > 0) {
+                badge.innerText = unreadCount;
+                badge.style.display = "inline-block";
+            } else {
+                badge.style.display = "none";
+            }
+        }
+
+        dropdown.innerHTML = "";
         notifications.forEach(notification => {
-            if (!notification.is_read) {
-                unread++;
-            }
-
             const item = document.createElement("div");
-            item.className = `notification-item ${!notification.is_read ? 'unread' : ''}`;
-
-            const sender = notification.sender_username || (notification.sender && notification.sender.username) || "Someone";
-            let text = "";
-
-            if (notification.type === "like") {
-                text = `${sender} liked your post`;
-            } else if (notification.type === "comment") {
-                text = `${sender} commented on your post`;
-            } else if (notification.type === "follow") {
-                text = `${sender} started following you`;
-            } else if (notification.type === "mention") {
-                text = `${sender} mentioned you in a comment`;
-            }
-
-            item.innerText = text;
-
-            item.addEventListener("click", function () {
-                openNotification(notification);
+            item.className = `notification-item ${notification.is_read ? 'read' : 'unread'}`;
+            item.innerText = notification.message || "New notification";
+            
+            item.addEventListener("click", async () => {
+                await markAsRead(notification.id);
             });
 
             dropdown.appendChild(item);
         });
-
-        if (unread > 0) {
-            count.innerText = unread;
-            count.style.display = "inline";
-        } else {
-            count.style.display = "none";
-        }
     }
 
-    async function openNotification(notification) {
+    async function markAsRead(notificationId) {
         try {
-            await fetch(`/api/v1/notifications/${notification.id}/read`, {
-                method: "PATCH"
+            await fetch(`/api/v1/notifications/${notificationId}/read`, {
+                method: "POST"
             });
-        } catch (err) {
-            console.error("Could not mark notification as read", err);
-        }
-
-        const targetUsername = notification.sender_username || (notification.sender && notification.sender.username);
-
-        if (notification.type === "follow") {
-            if (targetUsername) {
-                window.location.href = `/users/${targetUsername}`;
-            } else {
-                window.location.href = "/blog";
-            }
-        } else if (notification.post_id) {
-            window.location.href = `/posts/${notification.post_id}`;
-        } else {
-            window.location.href = "/blog";
+            fetchNotifications();
+        } catch (error) {
+            console.error("Mark as read error:", error);
         }
     }
 
-    loadNotifications();
+    fetchNotifications();
 
-    setInterval(loadNotifications, 30000);
+    notificationInterval = setInterval(fetchNotifications, 30000);
 });
