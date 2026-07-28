@@ -222,7 +222,6 @@ def delete_user(
 
     except Exception as e:
         db.rollback()
-        print(f"SİLME HATASI DETAYI: {str(e)}") 
         raise HTTPException(
             status_code=500,
             detail=f"Database error during deletion: {str(e)}"
@@ -558,6 +557,5 @@ def update_bio(
     db.refresh(current_user)
 
     return {
-        "message": "Bio updated successfully",
         "bio": current_user.bio
     }

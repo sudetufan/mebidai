@@ -1262,3 +1262,58 @@ input:focus, select:focus, textarea:focus {
 .toast.error {
     background: #ef4444;
 }
+
+@media (max-width: 768px) {
+
+    header {
+        padding: 10px 15px;
+    }
+
+    header h2 {
+        font-size: 22px;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+
+    nav {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .nav-left {
+        flex: none;
+        width: 100%;
+        justify-content: center;
+        gap: 18px;
+    }
+
+    .nav-center {
+        flex: none;
+        width: 100%;
+    }
+
+    .user-search input {
+        height: 34px;
+    }
+
+    .nav-right {
+        flex: none;
+        width: 100%;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .nav-right a {
+        font-size: 12px;
+    }
+
+    .welcome-user {
+        display: none;
+    }
+
+    .notification-wrapper {
+        transform: scale(0.85);
+    }
+
+}
