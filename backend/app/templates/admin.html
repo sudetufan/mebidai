@@ -222,11 +222,7 @@ async function executeDelete() {
 
         closeDeleteModal();
 
-        if (typeof showToast === "function") {
-            showToast("Deleted successfully");
-        } else {
-            alert("Deleted successfully");
-        }
+        showToast("Deleted successfully");
 
         setTimeout(() => {
             location.reload();
@@ -234,11 +230,7 @@ async function executeDelete() {
 
     } catch (error) {
         console.error("Delete error:", error);
-        if (typeof showToast === "function") {
-            showToast(error.message || "Delete failed", "error");
-        } else {
-            alert(error.message || "Delete failed");
-        }
+        showToast(error.message || "Delete failed", "error");
     }
 }
 

@@ -10,7 +10,7 @@ if (form) {
         const password = document.getElementById("password").value;
 
         if (!email || !password) {
-            alert("Please fill all fields");
+            showToast("Please fill all fields", "error");
             return;
         }
 
@@ -35,12 +35,12 @@ if (form) {
 
                 const error = await response.json();
 
-                alert(error.detail || "Login failed");
+                showToast(error.detail || "Login failed", "error");
 
                 return;
             }
 
-            alert("Login successful!");
+            showToast("Login successful!");
 
             window.location.href = "/";
 
@@ -48,8 +48,7 @@ if (form) {
 
             console.error(error);
 
-            alert("Something went wrong.");
-
+            showToast("Something went wrong.", "error");
         }
 
     });
@@ -80,7 +79,7 @@ window.handleGoogleLogin = async function (response) {
 
             const error = await res.json();
 
-            alert(error.detail || "Google login failed.");
+            showToast(error.detail || "Google login failed.", "error");
 
             return;
         }
@@ -91,7 +90,7 @@ window.handleGoogleLogin = async function (response) {
 
         console.error(error);
 
-        alert("Something went wrong.");
+        showToast("Something went wrong.", "error");
 
     }
 

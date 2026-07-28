@@ -228,7 +228,6 @@ def delete_user(
             detail=f"Database error during deletion: {str(e)}"
         )
 
-
 def get_profile(
     db: Session,
     current_user: User,
@@ -269,6 +268,7 @@ def get_profile(
         "username": current_user.username,
         "email": current_user.email,
         "role": current_user.role,
+        "bio": current_user.bio,  # <-- BURAYA BIO EKLENDI
         "post_count": post_count,
         "comment_count": comment_count,
         "like_count": like_count,
@@ -551,12 +551,13 @@ def update_bio(
     current_user: User,
     bio: str,
 ):
-    current_user.bio = bio.strip()
+    current_user.bio = bio.strip() if bio else ""
 
+    db.add(current_user)
     db.commit()
     db.refresh(current_user)
 
     return {
         "message": "Bio updated successfully",
-        "bio": current_user.bio,
+        "bio": current_user.bio
     }

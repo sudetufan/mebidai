@@ -200,6 +200,7 @@ def profile(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    db.refresh(current_user)  # <-- Veritabanından bio'nun en güncel halini çeker
     posts = get_user_posts(db, current_user.id)
     followers = get_followers(db, current_user.id)
     following = get_following(db, current_user.id)
@@ -208,6 +209,7 @@ def profile(
         "profile.html",
         {
             "request": request,
+            "user": current_user,
             "current_user": current_user,
             "posts": posts,
             "posts_count": len(posts),

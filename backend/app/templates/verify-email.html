@@ -1,25 +1,35 @@
 {% extends "base.html" %}
 
 {% block title %}
-Email Verification
+Email Verification - MEBIDAI
 {% endblock %}
 
-
 {% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow-sm border-0 text-center p-4 p-md-5" style="max-width: 480px; width: 100%; border-radius: 12px;">
+        <div class="card-body">
+            <!-- İkon Alanı -->
+            <div class="mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 text-primary" style="width: 72px; height: 72px;">
+                    <i class="bi bi-patch-check-fill display-5"></i>
+                </div>
+            </div>
 
-<h1>
-    Email Verification
-</h1>
+            <!-- Başlık -->
+            <h2 class="fw-bold mb-3">Email Verification</h2>
 
+            <!-- Mesaj -->
+            <p class="text-secondary mb-4 fs-6">
+                {{ message }}
+            </p>
 
-<p>
-    {{ message }}
-</p>
-
-
-<a href="/login">
-    Go to Login
-</a>
-
-
+            <!-- Giriş Yap Butonu -->
+            <div class="d-grid">
+                <a href="/login" class="btn btn-primary btn-lg fw-semibold" style="border-radius: 8px;">
+                    Go to Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

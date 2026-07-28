@@ -5,6 +5,8 @@ Settings
 {% endblock %}
 
 {% block content %}
+<div id="toast-container" class="toast-container"></div>
+
 <section class="settings-page">
     <div class="settings-container">
 
@@ -37,6 +39,7 @@ Settings
                     id="username"
                     type="text"
                     placeholder="Username"
+                    value="{{ current_user.username if current_user else '' }}"
                 >
 
                 <label for="email">
@@ -47,6 +50,7 @@ Settings
                     id="email"
                     type="email"
                     placeholder="Email"
+                    value="{{ current_user.email if current_user else '' }}"
                     disabled
                 >
 
@@ -65,7 +69,7 @@ Settings
                 <textarea
                     id="bio"
                     placeholder="Tell something about yourself..."
-                ></textarea>
+                >{{ current_user.bio if current_user and current_user.bio else '' }}</textarea>
 
                 <button
                     id="saveBio"

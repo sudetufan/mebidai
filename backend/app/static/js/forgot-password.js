@@ -10,7 +10,7 @@ document
             .trim();
 
         if (!email) {
-            alert("Please enter your email.");
+            showToast("Please enter your email.", "error");
             return;
         }
 
@@ -32,18 +32,18 @@ document
             const data = await response.json();
 
             if (!response.ok) {
-                alert(data.detail || "Something went wrong.");
+                showToast(data.detail || "Something went wrong.", "error");
                 return;
             }
 
-            alert(data.message);
+            showToast(data.message);
 
             window.location.href = "/login";
 
         } catch (error) {
             console.error(error);
 
-            alert("Server error.");
+            showToast("Server error.", "error");
         }
 
     });

@@ -30,11 +30,11 @@ document
         const data = await response.json();
 
         if (!response.ok) {
-            alert(data.detail);
+            showToast(data.detail, "error");
             return;
         }
 
-        alert(data.message);
+        showToast(data.message);
 
         window.location.href = "/login";
 

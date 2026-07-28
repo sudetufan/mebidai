@@ -13,7 +13,6 @@ def create_reset_token(
     db: Session,
     email: str,
 ) -> PasswordResetToken:
-
     user = (
         db.query(User)
         .filter(User.email == email)
@@ -46,7 +45,6 @@ def verify_reset_token(
     db: Session,
     token: str,
 ) -> PasswordResetToken:
-
     reset = (
         db.query(PasswordResetToken)
         .filter(PasswordResetToken.token == token)
@@ -79,7 +77,6 @@ def reset_password(
     token: str,
     new_password: str,
 ):
-
     reset = verify_reset_token(
         db,
         token,
@@ -91,10 +88,8 @@ def reset_password(
         .first()
     )
 
-    user.hashed_password = hash_password(
-        new_password
-    )
-
+    user.hashed_password = hash_password(new_password)
+    user.is_verified = True 
     reset.used = True
 
     db.commit()

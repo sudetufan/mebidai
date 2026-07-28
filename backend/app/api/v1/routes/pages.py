@@ -51,10 +51,12 @@ from app.schemas.comment import (
     CommentCreate,
     CommentUpdate,
 )
+
 router = APIRouter()
 templates = Jinja2Templates(
     directory="app/templates"
 )
+
 def mention_links(content):
     if not content:
         return ""
@@ -65,6 +67,7 @@ def mention_links(content):
         escaped_content,
     )
     return Markup(processed_content)
+
 templates.env.filters["mention_links"] = mention_links
 
 @router.get("/", response_class=HTMLResponse)
@@ -519,6 +522,7 @@ async def profile_page(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    db.refresh(current_user)
     posts = get_user_posts(
         db,
         current_user.id,
@@ -614,6 +618,7 @@ async def user_profile_page(
 @router.get("/settings", response_class=HTMLResponse)
 async def settings_page(
     request: Request,
+    db: Session = Depends(get_db),
     current_user: User | None = Depends(get_optional_user),
 ):
     if current_user is None:
@@ -621,6 +626,7 @@ async def settings_page(
             url="/login",
             status_code=303,
         )
+    db.refresh(current_user)
     return templates.TemplateResponse(
         request=request,
         name="settings.html",

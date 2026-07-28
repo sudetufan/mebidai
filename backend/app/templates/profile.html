@@ -1,40 +1,38 @@
 {% extends "base.html" %}
 
 {% block title %}
-{{ user.username if user else 'Profile' }} - MEBIDAI
+{{ (profile_user.username if profile_user else (user.username if user else 'Profile')) }} - MEBIDAI
 {% endblock %}
 
 {% block content %}
 
 <div class="profile-container">
     
-    <!-- Profil Header Kartı -->
     <div class="profile-card">
         
-        <!-- Avatar / Profil İkonu -->
         <div class="profile-avatar">
-            {{ (user.username[0] | upper) if user and user.username else 'U' }}
+            {% set active_u = profile_user or user or current_user %}
+            {{ (active_u.username[0] | upper) if active_u and active_u.username else 'U' }}
         </div>
 
-        <!-- Kullanıcı Adı & Rozet -->
         <h1 class="profile-username">
-            {{ user.username if user else 'User' }}
+            {% set active_u = profile_user or user or current_user %}
+            {{ active_u.username if active_u and active_u.username else 'User' }}
         </h1>
         
         <span class="profile-badge">
             Horizon Europe Contributor
         </span>
 
-        <!-- Bio -->
-        <p class="profile-bio {% if not user or not user.bio %}empty{% endif %}">
-            {% if user and user.bio %}
-                {{ user.bio }}
+        {% set active_bio = (profile_user.bio if profile_user and profile_user.bio else (user.bio if user and user.bio else (current_user.bio if current_user and current_user.bio else None))) %}
+        <p class="profile-bio {% if not active_bio %}empty{% endif %}">
+            {% if active_bio %}
+                {{ active_bio }}
             {% else %}
                 No bio added yet.
             {% endif %}
         </p>
 
-        <!-- İstatistikler -->
         <div class="profile-stats">
             <div>
                 <strong>
@@ -56,7 +54,8 @@
             </div>
         </div>
 
-        {% if current_user is defined and user is defined and current_user and current_user.id != user.id %}
+        {% set target_user = profile_user or user %}
+        {% if current_user is defined and target_user is defined and current_user and target_user and current_user.id != target_user.id %}
         <div class="follow-button">
             {% if is_following is defined and is_following %}
                 <button class="danger-btn" id="followBtn">Unfollow</button>
@@ -68,7 +67,6 @@
 
     </div>
 
-    <!-- Yayınlanan Gönderiler Bölümü -->
     <div class="profile-posts">
         <h2 class="profile-posts-title">
             Published Articles
@@ -108,7 +106,6 @@
 
 </div>
 
-<!-- Followers Modal -->
 <div id="followersModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -132,7 +129,6 @@
     </div>
 </div>
 
-<!-- Following Modal -->
 <div id="followingModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">

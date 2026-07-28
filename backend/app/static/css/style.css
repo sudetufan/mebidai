@@ -117,6 +117,16 @@ nav a:hover {
     color: var(--primary);
 }
 
+.notification-item.unread {
+    background: #f8fafc;
+    font-weight: 600;
+}
+
+.notification-item.read {
+    background: transparent;
+    opacity: 0.7;
+}
+
 #notificationCount {
     position: absolute;
     top: -6px;
@@ -712,6 +722,67 @@ input:focus, select:focus, textarea:focus {
     font-size: 14px;
 }
 
+/* Admin search */
+
+.admin-table-card form {
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.admin-table-card input[type="text"] {
+    flex:1;
+    max-width:320px;
+    padding:10px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-size:14px;
+    outline:none;
+    transition:.2s ease;
+}
+
+.admin-table-card input[type="text"]:focus {
+    border-color:#6366f1;
+    box-shadow:0 0 0 3px rgba(99,102,241,.15);
+}
+
+
+.admin-table-card button[type="submit"] {
+    border:none;
+    background:#6366f1;
+    color:white;
+    padding:10px 18px;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+.admin-table-card button[type="submit"]:hover {
+    background:#4f46e5;
+    transform:translateY(-1px);
+}
+
+
+/* Delete button */
+
+.admin-delete {
+    border:none;
+    background:#ef4444;
+    color:white;
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s ease;
+}
+
+.admin-delete:hover {
+    background:#dc2626;
+    transform:translateY(-1px);
+}
+
 .site-footer {
     margin-top: 80px;
     background: #0f172a;
@@ -1011,6 +1082,42 @@ input:focus, select:focus, textarea:focus {
     font-weight: 700;
     color: var(--text);
 }
+#cancelDelete,
+#confirmDelete {
+    border:none;
+    padding:10px 18px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s ease;
+    margin-left:8px;
+}
+
+
+/* Cancel */
+
+#cancelDelete {
+    background:#e5e7eb;
+    color:#374151;
+}
+
+#cancelDelete:hover {
+    background:#d1d5db;
+}
+
+
+/* Delete */
+
+#confirmDelete {
+    background:#ef4444;
+    color:white;
+}
+
+#confirmDelete:hover {
+    background:#dc2626;
+    transform:translateY(-1px);
+}
 
 .close {
     font-size: 24px;
@@ -1079,4 +1186,79 @@ input:focus, select:focus, textarea:focus {
     font-size: 0.9rem;
     text-align: center;
     padding: 20px 0 !important;
+}
+
+.like-area{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:20px;
+}
+
+.like-area form{
+    margin:0;
+}
+
+.like-btn{
+    border:none;
+    background:none;
+    cursor:pointer;
+    padding:0;
+    font-size:1.6rem;
+    color:#9ca3af;
+    transition:color .2s ease, transform .2s ease;
+}
+
+.like-btn:hover{
+    color:#ef4444 ;
+}
+
+.like-btn.liked{
+    color:#ef4444;
+}
+
+.likes-count{
+    border:none;
+    background:none;
+    cursor:pointer;
+    padding:0;
+    font-size:1rem;
+    font-weight:600;
+    color:#475569;
+}
+
+.likes-count:hover{
+    color:#ef4444;
+}
+
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+
+    min-width: 250px;
+    padding: 12px 20px;
+
+    background: #10b981;
+    color: white;
+
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,.15);
+
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: .3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.error {
+    background: #ef4444;
 }

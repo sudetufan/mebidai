@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const password = document.getElementById("password").value;
 
             if (!username || !email || !password) {
-                alert("Please fill all fields");
+                showToast("Please fill all fields", "error");
                 return;
             }
 
@@ -33,16 +33,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await response.json();
 
                 if (!response.ok) {
-                    alert(data.detail || "Registration failed");
+                    showToast(data.detail || "Registration failed", "error");
                     return;
                 }
 
-                alert("Registration successful. Please verify your email.");
+                showToast("Registration successful. Please verify your email.");
                 window.location.href = "/login";
 
             } catch (error) {
                 console.error(error);
-                alert("Something went wrong.");
+                showToast("Something went wrong.", "error");
             }
         });
     }
@@ -67,7 +67,7 @@ async function handleGoogleLogin(response) {
         const data = await res.json();
 
         if (!res.ok) {
-            alert(data.detail || "Google registration failed.");
+            showToast(data.detail || "Google registration failed.", "error");
             return;
         }
 
@@ -75,6 +75,6 @@ async function handleGoogleLogin(response) {
 
     } catch (error) {
         console.error(error);
-        alert("Something went wrong.");
+        showToast("Something went wrong.", "error");
     }
 }
