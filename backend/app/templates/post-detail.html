@@ -140,7 +140,6 @@
                     </div>
                 </div>
 
-                <!-- Yanıt Açılır Formu -->
                 {% if current_user %}
                 <div id="reply-form-{{ comment.id }}" class="reply-form-wrapper" style="display: none;">
                     <form method="post" action="/posts/{{ post.id }}/comment">
@@ -161,8 +160,6 @@
                     </form>
                 </div>
                 {% endif %}
-
-                <!-- Alt Yanıtlar Listesi (Nested Replies) -->
                 {% if comment.replies %}
                 <div class="replies-wrapper">
                     {% for reply in comment.replies %}
@@ -292,7 +289,6 @@ function toggleReplyForm(commentId) {
 </script>
 
 <style>
-/* Ana yorum kartı düzeni */
 .comment-card {
     display: block !important;
     width: 100% !important;
@@ -338,7 +334,6 @@ function toggleReplyForm(commentId) {
     font-weight: 500 !important;
 }
 
-/* Yanıt Kapsayıcısı ve Sol Çizgi */
 .replies-wrapper {
     display: flex !important;
     flex-direction: column !important;
@@ -350,7 +345,6 @@ function toggleReplyForm(commentId) {
     width: auto !important;
 }
 
-/* Yanıt Kartının Kendisi */
 .reply-item {
     display: block !important;
     width: 100% !important;
@@ -361,8 +355,6 @@ function toggleReplyForm(commentId) {
     box-sizing: border-box !important;
     margin: 0 !important;
 }
-
-/* Yanıt Formu */
 .reply-form-wrapper {
     margin-top: 12px !important;
     padding: 12px !important;

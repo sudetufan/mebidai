@@ -7,15 +7,9 @@ Edit Post
 
 {% block content %}
 
-
 <section class="create-page">
-
-
     <div class="create-card">
-
-
         <div class="create-header">
-
             <h1>
                 Edit Post
             </h1>
@@ -23,22 +17,14 @@ Edit Post
             <p>
                 Update your article details and save changes.
             </p>
-
         </div>
 
-
-
         <form method="post" action="/posts/{{ post.id }}/edit">
-
-
-
             <div class="form-group">
 
                 <label for="title">
                     Title
                 </label>
-
-
                 <input
                     id="title"
                     type="text"
@@ -46,91 +32,46 @@ Edit Post
                     value="{{ post.title }}"
                     required
                 >
-
             </div>
-
-
-
-
-
             <div class="form-group">
 
                 <label for="content">
                     Content
                 </label>
-
-
                 <textarea
                     id="content"
                     name="content"
                     required
                 >{{ post.content }}</textarea>
 
-
             </div>
-
-
-
-
-
             <div class="form-group">
 
                 <label for="category">
                     Category
                 </label>
-
-
                 <select
                     id="category"
                     name="category_id"
                     required
                 >
-
-
                     {% for category in categories %}
-
-
                     <option
                         value="{{ category.id }}"
                         {% if category.id == post.category.id %}selected{% endif %}
                     >
-
                         {{ category.name }}
-
                     </option>
-
-
                     {% endfor %}
-
-
                 </select>
-
-
             </div>
-
-
-
-
-
             <button
                 class="primary-btn"
                 type="submit"
             >
-
                 Save Changes
-
             </button>
-
-
-
         </form>
-
-
-
     </div>
-
-
 </section>
-
-
 {% endblock %}

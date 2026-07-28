@@ -55,17 +55,14 @@ def mention_links(text):
     if not text:
         return ""
 
-    # 1. Zararlı HTML/JS kodlarını temizle (XSS Koruması)
     escaped_text = str(escape(text))
 
-    # 2. Temizlenmiş metin üzerinden @mention linklerini oluştur
     processed_text = re.sub(
         r"@([a-zA-Z0-9_]+)",
         r'<a href="/users/\1">@\1</a>',
         escaped_text
     )
 
-    # 3. Güvenli HTML olarak döndür
     return Markup(processed_text)
 
 
@@ -130,7 +127,6 @@ async def http_exception_handler(
     request: Request,
     exc: StarletteHTTPException,
 ):
-    # API istekleri JSON dönmeli
     if request.url.path.startswith("/api/"):
         return JSONResponse(
             content={
@@ -139,7 +135,6 @@ async def http_exception_handler(
             status_code=exc.status_code,
         )
 
-    # Web sayfaları HTML hata sayfası dönmeli
     if exc.status_code == status.HTTP_404_NOT_FOUND:
         return templates.TemplateResponse(
             request,
@@ -171,7 +166,6 @@ async def internal_server_error(
     request: Request,
     exc: Exception,
 ):
-    # API tarafında 500 JSON dönsün
     if request.url.path.startswith("/api/"):
         return JSONResponse(
             content={
@@ -180,7 +174,6 @@ async def internal_server_error(
             status_code=500,
         )
 
-    # Normal sayfalarda güzel 500 ekranı
     return templates.TemplateResponse(
         request,
         "errors/500.html",

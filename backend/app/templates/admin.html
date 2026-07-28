@@ -25,7 +25,6 @@ Admin Panel
     </div>
 </div>
 
-<!-- USERS TABLE -->
 <div class="admin-table-card">
     <h2>Users</h2>
     <form method="get" action="/admin" onsubmit="saveScroll()">
@@ -80,7 +79,6 @@ Admin Panel
     </div>
 </div>
 
-<!-- POSTS TABLE -->
 <div class="admin-table-card">
     <h2>Posts</h2>
     <form method="get" action="/admin" onsubmit="saveScroll()">
@@ -127,7 +125,6 @@ Admin Panel
     </div>
 </div>
 
-<!-- COMMENTS TABLE -->
 <div class="admin-table-card">
     <h2>Comments</h2>
     <form method="get" action="/admin" onsubmit="saveScroll()">
@@ -174,7 +171,65 @@ Admin Panel
     </div>
 </div>
 
-<!-- MODAL -->
+<div class="admin-table-card">
+
+    <h2>Categories</h2>
+
+    <form id="categoryForm">
+        <input 
+            type="text"
+            id="categoryName"
+            placeholder="Category name"
+            required
+        >
+
+        <button type="submit">
+            Add Category
+        </button>
+    </form>
+
+
+    <table class="admin-table">
+
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+
+        <tbody>
+
+        {% for category in categories %}
+
+            <tr>
+
+                <td>
+                    {{ category.name }}
+                </td>
+
+
+                <td>
+
+                    <button
+                    class="admin-delete"
+                    onclick="openDeleteModal('/api/v1/categories/{{ category.id }}', 'Delete category {{ category.name }}?')">
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
 <div id="confirmModal" class="modal" style="display: none;">
     <div class="modal-content">
         <p id="confirmText">Are you sure?</p>
@@ -186,14 +241,73 @@ Admin Panel
 <script>
 let currentDeleteUrl = "";
 
+document
+.getElementById("categoryForm")
+?.addEventListener(
+"submit",
+async function(e){
+
+    e.preventDefault();
+
+    const name = document
+        .getElementById("categoryName")
+        .value
+        .trim();
+
+
+    if(!name){
+        return;
+    }
+
+
+    try{
+
+        const response = await fetch(
+            "/api/v1/categories/",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                credentials:"include",
+                body:JSON.stringify({
+                    name:name
+                })
+            }
+        );
+
+
+        if(!response.ok){
+            throw new Error("Category add failed");
+        }
+
+
+        showToast("Category added successfully");
+
+
+        setTimeout(()=>{
+            location.reload();
+        },500);
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showToast(
+            "Category could not be added",
+            "error"
+        );
+    }
+});
+
 function openDeleteModal(url, message) {
     currentDeleteUrl = url;
     document.getElementById("confirmText").textContent = message;
     
-    // Modal açma garantisi
     const modal = document.getElementById("confirmModal");
     modal.classList.add("show");
-    modal.style.display = "flex"; // CSS class takılsa bile görünür yap
+    modal.style.display = "flex"; 
 }
 
 function closeDeleteModal() {

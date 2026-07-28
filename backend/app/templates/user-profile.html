@@ -8,15 +8,12 @@
 
 <div class="profile-container">
     
-    <!-- Profil Header Kartı -->
     <div class="profile-card">
         
-        <!-- Avatar / Profil İkonu -->
         <div class="profile-avatar">
             {{ (profile_user['username'][0] | upper) if profile_user and profile_user['username'] else 'U' }}
         </div>
 
-        <!-- Kullanıcı Adı & Rozet -->
         <h1 class="profile-username">
             {{ profile_user['username'] if profile_user else 'User' }}
         </h1>
@@ -25,7 +22,6 @@
             Horizon Europe Contributor
         </span>
 
-        <!-- Bio -->
         <p class="profile-bio {% if not profile_user or not profile_user['bio'] %}empty{% endif %}">
             {% if profile_user and profile_user['bio'] %}
                 {{ profile_user['bio'] }}
@@ -34,7 +30,6 @@
             {% endif %}
         </p>
 
-        <!-- İstatistikler -->
         <div class="profile-stats">
             <div>
                 <strong>
@@ -56,7 +51,6 @@
             </div>
         </div>
 
-        <!-- Takip Et / Takipten Çık Buton Alanı -->
         {% if current_user and profile_user and current_user.id != profile_user['id'] %}
         <div class="follow-button" style="margin-top: 24px;">
             {% if is_following %}
@@ -73,7 +67,6 @@
 
     </div>
 
-    <!-- Yayınlanan Gönderiler Bölümü -->
     <div class="profile-posts">
         <h2 class="profile-posts-title">
             Published Articles
@@ -113,7 +106,6 @@
 
 </div>
 
-<!-- Followers Modal -->
 <div id="followersModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -137,7 +129,6 @@
     </div>
 </div>
 
-<!-- Following Modal -->
 <div id="followingModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">

@@ -33,9 +33,7 @@ document
             showToast(data.detail, "error");
             return;
         }
-
-        showToast(data.message);
-
+        showToast(data.message)
         window.location.href = "/login";
 
     });

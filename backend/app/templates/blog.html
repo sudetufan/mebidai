@@ -6,7 +6,6 @@ Discover - MEBIDAI Blog
 
 {% block content %}
 
-<!-- Toast / Error Notification -->
 {% if request.query_params.get("error") == "no_permission" %}
 <div id="toast-message" style="position: fixed; top: 20px; right: 20px; z-index: 9999; background: #ef4444; color: white; padding: 12px 20px; border-radius: 8px; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px;">
     <span>🚫 You do not have permission to edit or delete this item.</span>
@@ -25,7 +24,6 @@ Discover - MEBIDAI Blog
 </script>
 {% endif %}
 
-<!-- Sade ve Şık Blog Header -->
 <div class="blog-header" style="margin-bottom: 2rem;">
     <div>
         <span style="font-size: 0.85rem; font-weight: 600; color: #4f46e5; background: #e0e7ff; padding: 4px 12px; border-radius: 20px; display: inline-block; margin-bottom: 8px;">
@@ -46,7 +44,6 @@ Discover - MEBIDAI Blog
     {% endif %}
 </div>
 
-<!-- Search & Categories Bar -->
 <div class="blog-tools">
 
     <div class="categories">
@@ -86,7 +83,6 @@ Discover - MEBIDAI Blog
 
 </div>
 
-<!-- Posts Grid -->
 <div class="post-grid">
 
 {% if posts %}
@@ -129,7 +125,6 @@ Discover - MEBIDAI Blog
 
 </div>
 
-<!-- Pagination -->
 <div class="pagination">
 
 {% if page > 1 %}

@@ -722,7 +722,6 @@ input:focus, select:focus, textarea:focus {
     font-size: 14px;
 }
 
-/* Admin search */
 
 .admin-table-card form {
     display:flex;
@@ -762,9 +761,6 @@ input:focus, select:focus, textarea:focus {
     background:#4f46e5;
     transform:translateY(-1px);
 }
-
-
-/* Delete button */
 
 .admin-delete {
     border:none;
@@ -1095,8 +1091,6 @@ input:focus, select:focus, textarea:focus {
 }
 
 
-/* Cancel */
-
 #cancelDelete {
     background:#e5e7eb;
     color:#374151;
@@ -1105,9 +1099,6 @@ input:focus, select:focus, textarea:focus {
 #cancelDelete:hover {
     background:#d1d5db;
 }
-
-
-/* Delete */
 
 #confirmDelete {
     background:#ef4444;

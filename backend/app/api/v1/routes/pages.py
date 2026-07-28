@@ -489,6 +489,7 @@ async def admin_page(
         limit=10,
         query=comment_query,
     )
+    categories = get_categories(db)
     return templates.TemplateResponse(
         request=request,
         name="admin.html",
@@ -513,6 +514,7 @@ async def admin_page(
             "comment_limit": comments_data["limit"],
             "comments_pages": comments_data["pages"],
             "comment_query": comment_query,
+            "categories": categories,
         },
     )
 
