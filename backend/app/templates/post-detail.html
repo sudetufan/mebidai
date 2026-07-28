@@ -72,21 +72,23 @@
 
     <div class="action-card">
 
-        <h3>
-            Post Actions
-        </h3>
+        <h3>Post Actions</h3>
 
-        <a href="/posts/{{ post.id }}/edit">
-            Edit Post
-        </a>
+        <div class="post-actions">
 
-        <form method="post" action="/posts/{{ post.id }}/delete">
+            <a href="/posts/{{ post.id }}/edit" class="comment-action">
+                <i class="fa-solid fa-pen-to-square"></i>
+                Edit Post
+            </a>
 
-            <button class="danger-btn">
-                Delete Post
-            </button>
+            <form method="post" action="/posts/{{ post.id }}/delete">
+                <button type="submit" class="comment-action delete-action">
+                    <i class="fa-solid fa-trash"></i>
+                    Delete Post
+                </button>
+            </form>
 
-        </form>
+        </div>
 
     </div>
 
@@ -117,7 +119,7 @@
                         {% if current_user %}
                         <button 
                             type="button" 
-                            class="reply-toggle-btn"
+                            class="comment-action"
                             onclick="toggleReplyForm('{{ comment.id }}')"
                         >
                             Reply
@@ -125,14 +127,16 @@
                         {% endif %}
 
                         {% if current_user and current_user.id == comment.user_id %}
-                        <a href="/comments/{{ comment.id }}/edit" class="edit-link">
+                        <a href="/comments/{{ comment.id }}/edit" class="comment-action">
+                            <i class="fa-solid fa-pen-to-square"></i>
                             Edit
                         </a>
                         {% endif %}
 
                         {% if current_user and (current_user.id == comment.user_id or current_user.role == "admin") %}
                         <form method="post" action="/comments/{{ comment.id }}/delete" style="display:inline;">
-                            <button class="danger-btn small">
+                            <button class="comment-action delete-action">
+                                <i class="fa-solid fa-trash"></i>
                                 Delete
                             </button>
                         </form>
@@ -176,14 +180,16 @@
 
                         <div class="comment-footer">
                             {% if current_user and current_user.id == reply.user_id %}
-                            <a href="/comments/{{ reply.id }}/edit" class="edit-link">
+                            <a href="/comments/{{ reply.id }}/edit" class="comment-action">
+                                <i class="fa-solid fa-pen-to-square"></i>
                                 Edit
                             </a>
                             {% endif %}
 
                             {% if current_user and (current_user.id == reply.user_id or current_user.role == "admin") %}
                             <form method="post" action="/comments/{{ reply.id }}/delete" style="display:inline;">
-                                <button class="danger-btn small">
+                                <button class="comment-action delete-action">
+                                    <i class="fa-solid fa-trash"></i>
                                     Delete
                                 </button>
                             </form>
